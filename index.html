@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="cs">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HandyStat</title>
+    <link rel="icon" type="image/svg+xml" href="logo_HS.svg">
+    
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#232931">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="HandyStat">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Firebase SDKs (Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+</head>
+
+<body>
+    <!-- USER STATUS BAR -->
+    <div id="user-status-bar"
+        style="background: #232931; border-bottom: 1px solid #34495e; padding: 10px 20px; display: flex; justify-content: center; align-items: center; color: #fff; position: relative; z-index: 100002; font-family: 'Roboto', sans-serif;">
+
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <!-- CUSTOM TRANSLATE UI -->
+            <select id="custom-translate-select" onchange="triggerGoogleTranslate(this.value)" 
+                style="background: #34495e; color: #fff; border: 1px solid #7f8c8d; border-radius: 4px; padding: 4px 8px; font-size: 0.9rem; margin-right: 10px; outline: none; cursor: pointer;">
+                <option value="">🌐 Jazyk / Language</option>
+                <option value="cs">🇨🇿 Čeština</option>
+                <option value="en">🇬🇧 English</option>
+                <option value="de">🇩🇪 Deutsch</option>
+                <option value="fr">🇫🇷 Français</option>
+                <option value="es">🇪🇸 Español</option>
+                <option value="da">🇩🇰 Dansk</option>
+                <option value="no">🇳🇴 Norsk</option>
+                <option value="sv">🇸🇪 Svenska</option>
+                <option value="hu">🇭🇺 Magyar</option>
+                <option value="ja">🇯🇵 日本語</option>
+                <option value="ko">🇰🇷 한국어</option>
+            </select>
+            <!-- NATIVE GOOGLE TRANSLATE (HIDDEN) -->
+            <div id="google_translate_element" style="display:none;"></div>
+
+            <!-- MOVED: Email Display (Thin, Small) -->
+            <span id="user-email-display"
+                style="font-weight: 300; font-size: 0.8rem; letter-spacing: 0.5px; opacity: 0.9;">Nepřihlášen</span>
+
+            <span id="user-plan-badge"
+                style="background: #95a5a6; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem;">FREE</span>
+
+            <button id="btn-admin-dashboard" class="btn-primary"
+                style="padding: 5px 15px; font-size: 0.9rem; display: none; background-color: #8e44ad; border-color: #8e44ad; margin-right: 10px;"
+                onclick="authManager.openAdmin()">ADMINISTRACE</button>
+
+            <button id="btn-upgrade-pro" class="btn-success"
+                style="padding: 5px 15px; font-size: 0.9rem; display: none;"
+                onclick="authManager.openUpgrade()">UPGRADE</button>
+            <button id="btn-auth-action" class="btn-primary" style="padding: 5px 15px; font-size: 0.9rem;"
+                onclick="authManager.openLogin()">Přihlásit</button>
+        </div>
+    </div>
+    <!-- STARTUP OVERLAY REMOVED -->
+
+
+    <div id="app">
+        <!-- Print Header -->
+        <div class="print-header">HandyStat for Handball</div>
+        <!-- NAVIGATION (Hidden during match usually, but good for debug) -->
+        <nav class="top-nav">
+            <div class="nav-brand">
+                <img src="logo_HS.svg" class="nav-logo" alt="Logo">
+                <span class="brand-text">
+                    <span class="brand-gradient">HandyStat</span>
+                    <span
+                        style="font-weight: 300; font-size: 0.8rem; opacity: 0.8; color: #fff; letter-spacing: 1px;">for
+                        Handball</span>
+                </span>
+            </div>
+            <div class="nav-links">
+                <button onclick="app.navigateTo('setup')" class="nav-btn">Nastavení</button>
+                <button onclick="app.navigateTo('match')" class="nav-btn">Průběh utkání</button>
+                <button onclick="app.navigateTo('dashboard')" class="nav-btn">Statistiky</button>
+            </div>
+        </nav>
+
+        <!-- VIEW: SETUP -->
+        <section id="view-setup" class="view active">
+            <div class="setup-layout">
+                <!-- LEFT: Main Setup -->
+                <div class="setup-main">
+                    <h1>Nastavení utkání</h1>
+                    <div class="columns" style="margin-bottom: 20px;">
+                        <!-- LEFT COLUMN -->
+                        <!-- Row 1 -->
+                        <div class="form-group">
+                            <label>Datum</label>
+                            <input type="date" id="setup-date">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Čas</label>
+                                <input type="time" id="setup-time">
+                            </div>
+                            <div class="form-group">
+                                <label>Délka utkání</label>
+                                <select id="setup-match-duration">
+                                    <option value="2x30" selected>2x30 min</option>
+                                    <option value="2x25">2x25 min</option>
+                                    <option value="2x20">2x20 min</option>
+                                    <option value="2x15">2x15 min</option>
+                                    <option value="2x10">2x10 min</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Row 2 -->
+                        <div class="form-group">
+                            <label>Domácí tým</label>
+                            <input type="text" id="setup-home-name" value="Domácí">
+                        </div>
+                        <div class="form-group">
+                            <label>Hostující tým</label>
+                            <input type="text" id="setup-guest-name" value="Hosté">
+                        </div>
+                    </div>
+
+                    <div class="columns">
+                        <div class="card">
+                            <h2>Soupiska DOMÁCÍ</h2>
+                            <textarea id="setup-home-roster" placeholder="Číslo Jméno (jeden na řádek)">1 Novák (GK)
+10 Dvořák
+3 Procházka</textarea>
+                            <p class="hint">Formát: Číslo Jméno (GK pro brankáře)</p>
+                        </div>
+                        <div class="card">
+                            <h2>Soupiska HOSTÉ</h2>
+                            <textarea id="setup-guest-roster" placeholder="Číslo Jméno (jeden na řádek)">12 Černý (GK)
+7 Svoboda
+9 Kučera</textarea>
+                            <p class="hint">Formát: Číslo Jméno (GK pro brankáře)</p>
+                        </div>
+                    </div>
+
+                    <button class="btn-primary large" onclick="app.startMatch()">Zahájit utkání</button>
+                    
+                    <!-- DATA BACKUP ACTIONS -->
+                    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+                        <h3 style="margin-bottom: 15px; color: var(--text-muted); font-size: 1rem;">Záloha dat (Lokální)</h3>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <button class="btn-secondary" onclick="app.exportDataJSON()">Exportovat zálohu (JSON)</button>
+                            <button class="btn-secondary" onclick="document.getElementById('import-json-input').click()">Načíst zálohu (JSON)</button>
+                            <input type="file" id="import-json-input" accept=".json" style="display: none;" onchange="app.importDataJSON(event)">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT: Team Manager Sidebar -->
+                <div class="setup-sidebar">
+                    <h2>Knihovna týmů</h2>
+                    <div class="card manager-card">
+                        <div class="input-group">
+                            <label>Název týmu</label>
+                            <input type="text" id="mgr-team-name" placeholder="HC xyz">
+                        </div>
+                        <div class="input-group">
+                            <label style="margin-top: 12px;">Soupiska <span class="label-note">(Max 30
+                                    hráčů)</span></label>
+                            <!-- Structured Roster Input -->
+                            <div id="mgr-roster-rows" class="roster-rows-container">
+                                <!-- Generated Rows -->
+                            </div>
+                            <button class="btn-sm-add" onclick="teamManager.addRosterRow()">
+                                <i class="material-icons-round">add</i> Přidat hráče
+                            </button>
+                        </div>
+                        <button class="btn-secondary" onclick="teamManager.saveTeam()" style="margin-top: 8px;">Uložit
+                            tým</button>
+                    </div>
+
+                    <h3 style="margin-top: 24px;">Uložené týmy</h3>
+                    <div id="saved-teams-list" class="saved-teams-grid sidebar-list">
+                        <!-- Rendered via JS -->
+                    </div>
+                </div>
+
+                <!-- Standardized Footer Spacer -->
+                <div style="grid-column: 1 / -1; height: 120px; background: transparent; width: 100%;"></div>
+            </div>
+        </section>
+
+        <!-- VIEW: MATCH CONSOLE -->
+        <section id="view-match" class="view">
+            <!-- SCOREBOARD HEADER -->
+            <div class="scoreboard">
+                <div class="scoreboard-inner">
+                    <div class="team-score home">
+                        <span class="team-name" id="sb-home-name">DOM</span>
+                        <span class="score-value" id="sb-home-score">0</span>
+                    </div>
+                    <div class="timer-display">
+                        <div class="time" id="match-timer" onclick="matchTimer.edit()" style="cursor: pointer;"
+                            title="Klikni pro úpravu času">00:00</div>
+                        <div class="period" id="match-period">1. poločas</div>
+                        <div class="timer-controls">
+                            <button onclick="matchTimer.start()"><i class="material-icons-round">play_arrow</i></button>
+                            <button onclick="matchTimer.stop()"><i class="material-icons-round">pause</i></button>
+                            <button onclick="matchTimer.reset()"><i class="material-icons-round">replay</i></button>
+                        </div>
+                    </div>
+                    <div class="team-score guest">
+                        <span class="score-value" id="sb-guest-score">0</span>
+                        <span class="team-name" id="sb-guest-name">HOS</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="match-grid">
+                <!-- LEFT: PLAYERS -->
+                <!-- LEFT: PLAYERS -->
+                <div class="panel players-panel">
+                    <!-- NEW: Unified Controls Row -->
+                    <div class="controls-row-unified">
+                        <!-- Left: Team Toggle (Width matches one player column ~50%) -->
+                        <div class="team-toggle-container">
+                            <button id="btn-team-home" class="active"
+                                onclick="match.setActiveTeam('home')">Domácí</button>
+                            <button id="btn-team-guest" onclick="match.setActiveTeam('guest')">Hosté</button>
+                        </div>
+
+                        <!-- Right: Sub Out Button (Width matches one player column ~50%) -->
+                        <button id="btn-sub-out-toggle" class="btn-sub-out" onclick="match.toggleSubOutMode()">
+                            <i class="material-icons-round">south_east</i> Na lavičku
+                        </button>
+                    </div>
+
+                    <!-- NEW: Unified Roster Section -->
+                    <div class="roster-section unified-roster">
+                        <!-- Single Player Grid -->
+
+                        <!-- Single Player Grid -->
+                        <div id="roster-all" class="player-grid unified-grid">
+                            <!-- JS renders players here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MODAL: Sub In Confirmation -->
+
+
+                <!-- CENTER: COURT -->
+                <div class="panel court-panel">
+                    <!-- NEW: Top Action Bar (Centered) -->
+                    <div class="top-action-bar">
+                        <!-- Defense + -->
+                        <div class="action-item">
+                            <button class="btn-action defense-btn success" onclick="match.setAction('Obrana +')">
+                                <span class="def-label">Obrana</span>
+                                <span class="def-symbol">+</span>
+                            </button>
+                            <div id="count-defense-plus" class="action-counter">0</div>
+                        </div>
+
+                        <!-- Defense - -->
+                        <div class="action-item">
+                            <button class="btn-action defense-btn fail" onclick="match.setAction('Obrana -')">
+                                <span class="def-label">Obrana</span>
+                                <span class="def-symbol">-</span>
+                            </button>
+                            <div id="count-defense-minus" class="action-counter">0</div>
+                        </div>
+
+                        <!-- Technical Faults -->
+                        <div class="action-item">
+                            <button id="btn-tech-faults-trigger" class="btn-action defense-btn btn-dark-gray"
+                                onclick="match.openTechnicalModal()">
+                                <div>Technické<br>chyby</div>
+                            </button>
+                            <div id="count-tech-faults" class="action-counter">0</div>
+                        </div>
+
+                        <!-- Penalties -->
+                        <div class="action-item">
+                            <button id="btn-tresty-trigger" class="btn-action defense-btn btn-tresty-base"
+                                onclick="match.openPenaltyModal()">
+                                Tresty
+                            </button>
+                            <div id="count-penalties" class="action-counter">0</div>
+                        </div>
+
+                        <!-- Postupný útok -->
+                        <div class="action-item">
+                            <button class="btn-action defense-btn btn-dark-gray"
+                                onclick="match.setAction('Postupný útok')">
+                                <i class="material-icons-round">accessibility_new</i>
+                                <div>Postupný útok</div>
+                            </button>
+                            <div id="count-gradual-btn" class="action-counter">0</div>
+                        </div>
+
+                        <!-- Rychlý protiútok -->
+                        <div class="action-item">
+                            <button class="btn-action defense-btn btn-dark-gray btn-fast-attack"
+                                onclick="match.setAction('Rychlý protiútok')">
+                                <i class="material-icons-round" style="color: #2ecc71;">flash_on</i>
+                                <div>Rychlý protiútok</div>
+                            </button>
+                            <div id="count-fast-btn" class="action-counter">0</div>
+                        </div>
+                    </div>
+
+                    <div class="court-container" id="court-heatmap">
+                        <div class="goal-area" onclick="match.handleShotGuard(event)"></div>
+                        <div class="nine-meter-line"></div>
+                        <div class="btn-7m" onclick="match.handle7mClick(event)">7m</div>
+                        <div class="goal-structure" onclick="match.handleGoalPlacement(event, 0)">
+                            <div class="goal-grid-numbers">
+                                <div onclick="match.handleGoalPlacement(event, 1)">1</div>
+                                <div onclick="match.handleGoalPlacement(event, 2)">2</div>
+                                <div onclick="match.handleGoalPlacement(event, 3)">3</div>
+                                <div onclick="match.handleGoalPlacement(event, 4)">4</div>
+                                <div onclick="match.handleGoalPlacement(event, 5)">5</div>
+                                <div onclick="match.handleGoalPlacement(event, 6)">6</div>
+                                <div onclick="match.handleGoalPlacement(event, 7)">7</div>
+                                <div onclick="match.handleGoalPlacement(event, 8)">8</div>
+                                <div onclick="match.handleGoalPlacement(event, 9)">9</div>
+                            </div>
+                        </div>
+                        <div class="center-line"></div>
+
+                        <!-- SECTOR LINES -->
+                        <div class="sector-lines">
+                            <div class="sector-line line-1"></div>
+                            <div class="sector-line line-2"></div>
+                            <div class="sector-line line-3"></div>
+                            <div class="sector-line line-4"></div>
+                        </div>
+
+                        <!-- SECTOR LABELS (Watermarks) -->
+                        <div class="sector-labels">
+                            <div class="sector-label s1" onclick="match.handleSectorClick(event, 'LW')">LW</div>
+                            <div class="sector-label s2" onclick="match.handleSectorClick(event, 'LB')">LB</div>
+                            <div class="sector-label s3" onclick="match.handleSectorClick(event, 'CB')">CB</div>
+                            <div class="sector-label s4" onclick="match.handleSectorClick(event, 'RB')">RB</div>
+                            <div class="sector-label s5" onclick="match.handleSectorClick(event, 'RW')">RW</div>
+                            <div class="sector-label s6" onclick="match.handleSectorClick(event, 'RP')">RP</div>
+                            <div class="sector-label s7" onclick="match.handleSectorClick(event, 'LP')">LP</div>
+                        </div>
+
+                        <!-- SECTOR ZONES (Invisible Click Areas) -->
+                        <div class="sector-zones">
+                            <div class="sector-zone z-lw" onclick="match.handleSectorClick(event, 'LW')"></div>
+                            <div class="sector-zone z-lb" onclick="match.handleSectorClick(event, 'LB')"></div>
+                            <div class="sector-zone z-cb" onclick="match.handleSectorClick(event, 'CB')"></div>
+                            <div class="sector-zone z-rb" onclick="match.handleSectorClick(event, 'RB')"></div>
+                            <div class="sector-zone z-rw" onclick="match.handleSectorClick(event, 'RW')"></div>
+                            <div class="sector-zone z-lp" onclick="match.handleSectorClick(event, 'LP')"></div>
+                            <div class="sector-zone z-rp" onclick="match.handleSectorClick(event, 'RP')"></div>
+                        </div>
+
+                        <!-- CUSTOM WARNING OVERLAY -->
+                        <div id="court-alert-overlay"
+                            style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(231, 76, 60, 0.95); color: white; padding: 20px 40px; border-radius: 8px; font-weight: bold; text-align: center; z-index: 1000; box-shadow: 0 5px 15px rgba(0,0,0,0.5); pointer-events: none;">
+                            Pro zapsání statistiky je nutno vybrat sektor, ze kterého byla akce provedena.
+                        </div>
+
+
+                        <!-- Interactive Overlay -->
+                        <div class="court-overlay" onclick="match.handleCourtClick(event)"></div>
+
+                        <!-- Markers container -->
+                        <div id="shot-markers"></div>
+                    </div>
+                    <!-- MODAL: Shot Result -->
+                    <div class="modal" id="modal-shot-result">
+                        <div class="modal-content small-modal text-center">
+                            <h3 style="margin-bottom: 16px;">Výsledek střelby</h3>
+
+                            <!-- Step 1: Outcome -->
+                            <div id="shot-result-step-1">
+                                <div class="shot-result-options">
+                                    <button id="btn-shot-success" class="btn-success large"
+                                        onclick="match.confirmResult('Gól')"
+                                        style="margin-bottom: 16px; width: 100%; height: 60px;">GÓL</button>
+                                    <div id="fail-options">
+                                        <button id="btn-shot-fail" class="btn-yellow large"
+                                            onclick="match.confirmResult('Neúspěšná střela')"
+                                            style="margin-bottom: 16px; width: 100%; height: 60px;">NEÚSPĚŠNÁ
+                                            STŘELA</button>
+                                        <button id="btn-shot-off-target" class="btn-secondary large"
+                                            onclick="match.confirmResult('Mimo branku')"
+                                            style="display: none; margin-bottom: 16px; width: 100%; height: 60px; background-color: #95a5a6; border-color: #7f8c8d;">MIMO
+                                            BRANKU</button>
+
+                                        <!-- GK OFFENSIVE ACTIONS (Hidden by default) -->
+                                        <div id="gk-offensive-actions"
+                                            style="display: none; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; margin-top: 10px;">
+                                            <button class="btn-primary large" onclick="match.confirmResult('Gól')"
+                                                style="margin-bottom: 16px; width: 100%; height: 60px; background-color: #2ecc71;">GÓL
+                                                <small>(Přes hřiště)</small></button>
+                                            <button class="btn-yellow large"
+                                                onclick="match.confirmResult('Neúspěšná střela')"
+                                                style="margin-bottom: 16px; width: 100%; height: 60px;">NEÚSPĚŠNÁ
+                                                STŘELA</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="btn-secondary"
+                                    onclick="document.getElementById('modal-shot-result').classList.remove('show')"
+                                    style="width: 100%;">Zrušit</button>
+                            </div>
+
+                            <!-- Step 2: Placement (1-9) -->
+                            <div id="shot-result-step-2" style="display: none;">
+                                <p style="margin-bottom: 10px; color: var(--text-muted);">Kam střela směřovala?</p>
+                                <div class="goal-grid-selector">
+                                    <button onclick="match.confirmPlacement(1, event)">1</button>
+                                    <button onclick="match.confirmPlacement(2, event)">2</button>
+                                    <button onclick="match.confirmPlacement(3, event)">3</button>
+                                    <button onclick="match.confirmPlacement(4, event)">4</button>
+                                    <button onclick="match.confirmPlacement(5, event)">5</button>
+                                    <button onclick="match.confirmPlacement(6, event)">6</button>
+                                    <button onclick="match.confirmPlacement(7, event)">7</button>
+                                    <button onclick="match.confirmPlacement(8, event)">8</button>
+                                    <button onclick="match.confirmPlacement(9, event)">9</button>
+                                </div>
+                                <button class="btn-secondary" onclick="match.backToResultStep1()"
+                                    style="width: 100%; margin-top: 15px;">Zpět</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="notification-container" id="notification-container"></div>
+                    <!-- SPACER FOR SCROLLING -->
+                    <div style="height: 150px; width: 100%; flex-shrink: 0;"></div>
+                </div>
+
+                <!-- RIGHT: ACTIONS -->
+                <!-- NEW: Defense Buttons (Square) -->
+                <!-- NEW: Defense Buttons (3 Rows) -->
+                <!-- Row 1 -->
+                <!-- Unified Action Grid -->
+                <!-- RIGHT: MATCH LOG -->
+                <div class="panel side-panel"
+                    style="height: 100%; overflow: hidden; display: flex; flex-direction: column;">
+                    <h3 style="margin: 0 0 10px 0; text-align: center; font-size: 1rem; color: #aaa;">Zápis</h3>
+                    <div class="action-logs" id="action-logs" style="flex: 1; overflow-y: auto;">
+                        <!-- Last actions inserted here -->
+                    </div>
+                </div>
+            </div>
+            <!-- MODAL: Sub In Confirmation (Moved out of Grid) -->
+            <div id="modal-sub-in-confirm" class="modal">
+                <div class="modal-content text-center small-modal">
+                    <h3>Poslat na hřiště?</h3>
+                    <p id="sub-in-player-name" style="margin-bottom: 20px; font-weight: bold; color: #fff;"></p>
+                    <div class="modal-buttons-vertical">
+                        <button class="btn-primary" id="btn-confirm-sub-in"
+                            style="background-color: #2ecc71; border-color: #2ecc71;">Na hřiště</button>
+                        <button class="btn-secondary"
+                            onclick="document.getElementById('modal-sub-in-confirm').classList.remove('show')"
+                            style="border: 1px solid #333; background: #000;">Zavřít</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: DASHBOARD -->
+        <section id="view-dashboard" class="view">
+            <div class="container">
+                <div class="dashboard-header">
+                    <h1>Zápis průběhu utkání</h1>
+
+                    <div class="dashboard-controls">
+                        <div class="team-toggle" style="width: 300px;">
+                            <button id="stat-toggle-home" class="active"
+                                onclick="dashboard.setStatsTeam('home')">Domácí</button>
+                            <button id="stat-toggle-guest" onclick="dashboard.setStatsTeam('guest')">Hosté</button>
+                        </div>
+
+                        <div class="header-stat">
+                            <h3 id="lbl-shot-eff">Úspěšnost střelby</h3>
+                            <div class="big-number" id="stat-shot-efficiency">0%</div>
+                        </div>
+                        <div class="header-stat">
+                            <h3 id="lbl-save-eff">Úspěšnost brankáře</h3>
+                            <div class="big-number" id="stat-save-efficiency">0%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-grid-layout">
+                    <!-- Left Column: Table & Actions -->
+                    <div class="stats-col-left">
+                        <div class="card">
+                            <h2 id="match-log-header">Zápis průběhu utkání</h2>
+                            <table class="data-table" id="events-table">
+                                <thead>
+                                    <tr>
+                                        <th>Čas</th>
+                                        <th>Tým</th>
+                                        <th>Hráč</th>
+                                        <th>Akce</th>
+                                        <th>Sektor</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Events injected here -->
+                                </tbody>
+                            </table>
+                        </div>
+
+
+                    </div>
+
+                    <!-- Right Column: Graphics -->
+                    <div class="stats-col-right">
+                        <div class="card" style="height: 100%;">
+                            <h2>Grafická osa</h2>
+                            <div id="stats-charts" class="charts-container" style="margin-top: 20px;">
+                                <div class="timeline-section">
+                                    <h3>1. poločas</h3>
+                                    <div class="timeline-wrapper">
+                                        <div id="timeline-h1" class="timeline-track"></div>
+                                    </div>
+                                </div>
+                                <div class="timeline-section" style="margin-top: 20px;">
+                                    <h3>2. poločas</h3>
+                                    <div class="timeline-wrapper">
+                                        <div id="timeline-h2" class="timeline-track"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Stats Selector Card -->
+                        <div class="card" style="margin-top: 20px;">
+                            <h2>Grafická statistika</h2>
+                            <div class="stats-selectors-grid">
+                                <!-- Home Column -->
+                                <div class="selector-col home">
+                                    <h3>Domácí</h3>
+                                    <button class="btn-stat-select btn-match-stats-home"
+                                        onclick="dashboard.openMatchStats('home')">Technický zápis</button>
+                                    <button class="btn-stat-select"
+                                        onclick="dashboard.showTeamStats('home')">Tým</button>
+                                    <select id="stat-select-home-player" class="btn-stat-select"
+                                        onchange="dashboard.showPlayerStats('home', this.value)">
+                                        <option value="" disabled selected>Hráč</option>
+                                    </select>
+                                    <select id="stat-select-home-gk" class="btn-stat-select"
+                                        onchange="dashboard.showPlayerStats('home', this.value)">
+                                        <option value="" disabled selected>Brankář</option>
+                                    </select>
+                                    <select id="stat-select-home-pos" class="btn-stat-select"
+                                        onchange="dashboard.showPositionStats('home', this.value)">
+                                        <option value="" disabled selected>Herní funkce</option>
+                                        <option value="GK">GK</option>
+                                        <option value="LW">LW</option>
+                                        <option value="LB">LB</option>
+                                        <option value="CB">CB</option>
+                                        <option value="RB">RB</option>
+                                        <option value="RW">RW</option>
+                                        <option value="P">P</option>
+                                    </select>
+                                </div>
+                                <!-- Guest Column -->
+                                <div class="selector-col guest">
+                                    <h3>Hosté</h3>
+                                    <button class="btn-stat-select btn-match-stats-guest"
+                                        onclick="dashboard.openMatchStats('guest')">Statistika utkání</button>
+                                    <button class="btn-stat-select"
+                                        onclick="dashboard.showTeamStats('guest')">Tým</button>
+                                    <select id="stat-select-guest-player" class="btn-stat-select"
+                                        onchange="dashboard.showPlayerStats('guest', this.value)">
+                                        <option value="" disabled selected>Hráč</option>
+                                    </select>
+                                    <select id="stat-select-guest-gk" class="btn-stat-select"
+                                        onchange="dashboard.showPlayerStats('guest', this.value)">
+                                        <option value="" disabled selected>Brankář</option>
+                                    </select>
+                                    <select id="stat-select-guest-pos" class="btn-stat-select"
+                                        onchange="dashboard.showPositionStats('guest', this.value)">
+                                        <option value="" disabled selected>Herní funkce</option>
+                                        <option value="GK">GK</option>
+                                        <option value="LW">LW</option>
+                                        <option value="LB">LB</option>
+                                        <option value="CB">CB</option>
+                                        <option value="RB">RB</option>
+                                        <option value="RW">RW</option>
+                                        <option value="P">P</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Moved Export Actions -->
+                        <div class="export-actions"
+                            style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
+                            <button class="btn-primary"
+                                onclick="document.getElementById('modal-history').classList.add('show'); historyManager.refresh();"
+                                style="background-color: #9b59b6;">Moje Zápasy</button>
+
+                            <button class="btn-primary btn-print-pdf" onclick="app.printLog()"
+                                style="background-color: #95a5a6;">Tisk Zápisu</button>
+                            <button class="btn-secondary" onclick="app.exportToCSV()">Export CSV</button>
+                            <button class="btn-secondary" onclick="dashboard.confirmClear()"
+                                style="border-color: #e74c3c; color: #e74c3c; margin-left: auto;">Vymazat
+                                statistiky</button>
+                        </div>
+
+                        <!-- USER REQUEST: Transparent Footer (120px) -->
+                        <div style="height: 120px; background: transparent; width: 100%;"></div>
+
+                    </div>
+                </div>
+            </div>
+            <!-- Standardized Footer Spacer (Outside Grid) -->
+            <div style="height: 120px; background: transparent; width: 100%;"></div>
+    </div> <!-- End match-grid (flex container on mobile) -->
+    </section>
+
+    <!-- VIEW: TEAM STATS -->
+    <section id="view-team-stats" class="view" style="display: none;">
+        <div class="container">
+            <div class="dashboard-header"
+                style="flex-direction: row; justify-content: space-between; align-items: center; gap: 15px; position: relative;">
+                <!-- Left: Back -->
+                <div>
+                    <button class="btn-danger" onclick="dashboard.showOverview()"
+                        style="text-transform: none !important;">Zpět</button>
+                </div>
+
+
+                <!-- Center: Title -->
+                <div
+                    style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: flex; align-items: center; justify-content: center;">
+                    <h2 id="team-stats-title"
+                        style="margin: 0; border: none; font-size: 1.8rem; color: #fff; text-transform: uppercase; letter-spacing: 2px; line-height: 1;">
+                        STATISTIKY
+                    </h2>
+                </div>
+
+                <!-- Right: Export -->
+                <div class="export-actions" style="display: flex; gap: 10px;">
+                    <button class="btn-primary btn-print-pdf" onclick="window.print()">Tisk PDF</button>
+                    <button class="btn-secondary" onclick="app.exportToCSV()">Export CSV</button>
+                </div>
+            </div>
+            <!-- Title Moved to Header -->
+
+            <!-- 1. Timeline Section (Full Width) -->
+            <div class="card" style="margin-top: 20px;">
+                <h2 style="font-size: 1rem; margin-bottom: 20px;">Časová osa</h2>
+                <div class="charts-container">
+                    <div id="timeline-section-h1" class="timeline-section">
+                        <h3 style="font-size: 0.8rem; margin-bottom: 5px;">1. poločas</h3>
+                        <div class="timeline-wrapper" style="position: relative;">
+                            <div id="timeline-team-h1" class="timeline-track compact"></div>
+                        </div>
+                    </div>
+                    <div id="timeline-section-h2" class="timeline-section" style="margin-top: 15px;">
+                        <h3 style="font-size: 0.8rem; margin-bottom: 5px;">2. poločas</h3>
+                        <div class="timeline-wrapper" style="position: relative;">
+                            <div id="timeline-team-h2" class="timeline-track compact"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Court Map Section (Centered) -->
+            <div class="card" style="margin-top: 20px;">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+                    <h2 style="font-size: 1rem; margin: 0;">Mapa střelby</h2>
+                    <div style="display: flex; gap: 15px; font-size: 0.8rem;">
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <div style="width: 12px; height: 12px; border-radius: 50%; background: var(--goal);">
+                            </div>
+                            <span>Gól</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <div style="width: 12px; height: 12px; border-radius: 50%; background: #f1c40f;"></div>
+                            <span>Neúspěšná střela</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <div style="width: 12px; height: 12px; border-radius: 50%; background: var(--miss);">
+                            </div>
+                            <span>Obdržený gól</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <div style="width: 12px; height: 12px; border-radius: 50%; background: #8e44ad;">
+                            </div>
+                            <span>Zákrok</span>
+                        </div>
+                        <div id="legend-gk-miss" style="display: none; align-items: center; gap: 5px;">
+                            <div
+                                style="width: 12px; height: 12px; border-radius: 50%; background: #95a5a6; border: 2px solid #7f8c8d;">
+                            </div>
+                            <span style="font-size: 0.75rem; color: #7f8c8d;">Střela soupeře mimo bránu</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="court-panel"
+                    style="background: transparent; padding: 0; box-shadow: none; display: flex; justify-content: center;">
+                    <div class="court-container" id="team-stats-court"
+                        style="margin: 0; width: 100%; position: relative;">
+                        <!-- Court Graphics -->
+                        <div class="goal-area"></div>
+                        <div class="nine-meter-line"></div>
+                        <div class="seven-meter-line"></div>
+                        <div class="goal-structure">
+                            <div class="goal-grid-numbers">
+                                <div>1</div>
+                                <div>2</div>
+                                <div>3</div>
+                                <div>4</div>
+                                <div>5</div>
+                                <div>6</div>
+                                <div>7</div>
+                                <div>8</div>
+                                <div>9</div>
+                            </div>
+                        </div>
+                        <div class="center-line"></div>
+                        <div class="sector-lines">
+                            <div class="sector-line line-1"></div>
+                            <div class="sector-line line-2"></div>
+                            <div class="sector-line line-3"></div>
+                            <div class="sector-line line-4"></div>
+                        </div>
+                        <!-- Markers Container (Absolute Overlay) -->
+                        <div id="team-stats-markers"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    </div>
+
+    <!-- Modals or overlays can go here -->
+
+    <!-- Notification Area -->
+    <!-- Notification Area -->
+    <div id="notification-area"></div>
+
+    <!-- MODALS -->
+    <div id="modal-player-selection" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Vyber hráče k utkání</h3>
+                <span class="close-modal" onclick="teamManager.closeSelection()">&times;</span>
+            </div>
+            <div id="selection-list" class="selection-list">
+                <!-- Players rendered here -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="teamManager.closeSelection()">Zrušit</button>
+                <button class="btn-primary" onclick="teamManager.saveSelection()">Potvrdit výběr</button>
+            </div>
+        </div>
+    </div>
+
+    </div>
+
+
+
+    <!-- Time Edit Modal -->
+    <div id="modal-time-edit" class="modal" style="z-index: 10000;">
+        <div class="modal-content small-modal">
+            <h3>Upravit čas</h3>
+            <div style="padding: 20px 0;">
+                <input type="text" id="time-edit-input" placeholder="MM:SS" maxlength="5"
+                    style="font-size: 3rem; text-align: center; font-weight: 700; letter-spacing: 2px; width: 100%; border: 2px solid var(--primary); background: rgba(0,0,0,0.3); color: white; border-radius: 8px;">
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary"
+                    onclick="document.getElementById('modal-time-edit').classList.remove('show')">Zrušit</button>
+                <button class="btn-primary" onclick="matchTimer.saveEdit()">Uložit</button>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <!-- Confirm Modal -->
+    <div id="modal-confirm" class="modal" style="z-index: 10000;">
+        <div class="modal-content confirm-content">
+            <h3 id="modal-confirm-title">Upozornění</h3>
+            <p id="confirm-message">Opravdu chcete provést tuto akci?</p>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="teamManager.closeConfirm()">Ne</button>
+                <button id="btn-confirm-yes" class="btn-primary" style="text-transform: none !important;">Ano,
+                    smazat</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- End Match Modal -->
+    <div id="modal-end-match" class="modal" style="z-index: 10001;">
+        <div class="modal-content confirm-content">
+            <h3>Konec utkání</h3>
+            <p>Ukončit utkání nebo nastavit prodloužení?</p>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="matchTimer.setupOvertime()">Nastavit prodloužení</button>
+                <button class="btn-primary" onclick="matchTimer.confirmEndMatch()">Ukončit utkání</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- GK SELECTION MODAL -->
+    <div id="modal-gk-select" class="modal">
+        <div class="modal-content small-modal">
+            <h3>Vyber brankáře</h3>
+            <div id="gk-select-list" class="action-list"></div>
+            <div class="modal-footer">
+                <button class="btn-secondary"
+                    onclick="document.getElementById('modal-gk-select').classList.remove('open')">Zrušit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Match Stats Modal (Moved to Body Root for Print) -->
+    <div id="modal-match-stats" class="modal" style="z-index: 10005;">
+        <div class="modal-content" style="max-width: 95%; width: 1200px; height: 90vh; overflow-y: auto;">
+            <div class="modal-header">
+                <h3>Statistika utkání</h3>
+            </div>
+            <div class="modal-body" style="padding: 0;">
+                <div id="match-stats-header-info"
+                    style="margin-bottom: 20px; padding: 20px; background: #232931 !important; color: #fff !important; border-radius: 8px; border: 1px solid #000;">
+                    <!-- Injected JS -->
+                </div>
+
+                <div class="table-responsive">
+                    <table class="data-table" id="match-stats-table">
+                        <thead>
+                            <tr>
+                                <th style="width: auto;">Hráč</th>
+                                <th style="width: 100px; text-align: center;">Obrana</th>
+                                <th style="width: 120px; text-align: center;">T.CH.</th>
+                                <th style="width: 150px; text-align: center;">Tresty</th>
+                                <th style="width: 150px; text-align: center;">Počet střel / Gól</th>
+                                <th style="width: 150px; text-align: center;">Zákroky / Počet střel</th>
+                            </tr>
+                        </thead>
+                        <tbody id="match-stats-body">
+                            <!-- JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-primary btn-print-pdf" onclick="window.print()">Tisk PDF</button>
+                <button class="btn-secondary" onclick="dashboard.closeMatchStats()">Zavřít</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <!-- AUTH MODAL -->
+    <div id="modal-auth" class="modal" style="z-index: 100001;">
+        <div class="modal-content small-modal" style="text-align: center;">
+            <div style="margin-bottom: 20px;">
+                <img src="logo_HS.svg" alt="HandyStat Logo" style="width: 60px; height: 60px; margin-bottom: 10px;">
+                <h3 id="auth-modal-title"
+                    style="margin: 0; font-size: 1.8rem; background: linear-gradient(to right, #8ae4cf, #3e15c3); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;">
+                    HandyStat</h3>
+            </div>
+
+            <div style="margin-bottom: 15px; text-align: left;">
+                <input type="email" id="auth-email" placeholder="Email"
+                    style="width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 4px; border: 1px solid #ddd;">
+                <input type="password" id="auth-password" placeholder="Heslo"
+                    style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ddd;">
+                <input type="password" id="auth-password-verify" placeholder="Ověření hesla"
+                    style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ddd; margin-top: 10px; display: none;">
+            </div>
+
+            <!-- Error Message Container -->
+            <p id="auth-error-msg"
+                style="color: #e74c3c; font-weight: bold; font-size: 0.9rem; margin-bottom: 15px; display: none; text-align: center;">
+            </p>
+
+            <button class="btn-primary" id="btn-submit-auth"
+                style="width: 100%; margin-bottom: 15px; font-weight: bold; font-size: 1.1rem;">Přihlásit</button>
+
+            <p id="auth-switch-text"
+                style="color: #4ecca3; font-size: 1rem; cursor: pointer; text-decoration: none; font-weight: 500; transition: color 0.3s;"
+                onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#4ecca3'"
+                onclick="authManager.toggleAuthMode()">Nemáte účet? <span
+                    style="text-decoration: underline;">Zaregistrujte se</span></p>
+
+            <button class="btn-secondary" onclick="document.getElementById('modal-auth').classList.remove('show')"
+                style="width: 100%; margin-top: 20px;">Zavřít</button>
+        </div>
+    </div>
+
+    <!-- SUBSCRIPTION MODAL -->
+    <div id="modal-upgrade" class="modal" style="z-index: 100001;">
+        <div class="modal-content text-center modal-upgrade-wide">
+            <h2 style="font-size: 2rem; margin-bottom: 10px;">Přejít na PRO verzi</h2>
+            <p style="margin-bottom: 20px; font-size: 1.1rem;">Získejte naprostou svobodu pro váš tým.</p>
+
+            <div class="pricing-container">
+                <!-- FREE CARD -->
+                <div class="pricing-card">
+                    <h3>FREE</h3>
+                    <div class="pricing-price">0 Kč</div>
+                    <div class="pricing-period">měsíčně</div>
+                    <ul class="pricing-features">
+                        <li><span style="color: #e74c3c;">❌</span> <span>Max 1 Brankář</span></li>
+                        <li><span style="color: #e74c3c;">❌</span> <span>Max 3 Hráči</span></li>
+                        <li><span style="color: #e74c3c;">❌</span> <span>Tisk PDF zakázán</span></li>
+                    </ul>
+                </div>
+
+                <!-- PRO CARD -->
+                <div class="pricing-card pro">
+                    <div
+                        style="position: absolute; top: -12px; right: 20px; background: var(--primary); color: #232931; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; box-shadow: 0 4px 10px rgba(78, 204, 163, 0.4);">
+                        DOPORUČENO</div>
+                    <h3 style="color: var(--primary);">PRO</h3>
+                    <div class="pricing-price">60 Kč</div>
+                    <div class="pricing-period">měsíčně</div>
+                    <ul class="pricing-features">
+                        <li><span style="color: #2ecc71;">✅</span> <span>30 hráčů v jednom týmu</span></li>
+                        <li><span style="color: #2ecc71;">✅</span> <span>Ukládání vlastních týmů</span></li>
+                        <li><span style="color: #2ecc71;">✅</span> <span>Tisk do PDF</span></li>
+                    </ul>
+                </div>
+            </div>
+
+            <button class="btn-success large" onclick="authManager.processPayment()"
+                style="width: 100%; border-radius: 30px; padding: 15px; font-size: 1.2rem; font-weight: bold; box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);">
+                Přejít na PRO (60 Kč)
+            </button>
+
+
+            <button class="btn-secondary" onclick="document.getElementById('modal-upgrade').classList.remove('show')"
+                style="width: 100%; margin-top: 15px;">Zavřít</button>
+        </div>
+    </div>
+
+    <!-- HISTORY MODAL -->
+    <div id="modal-history" class="modal" style="z-index: 100000;">
+        <div class="modal-content wide-modal">
+            <div class="modal-header">
+                <h3>Historie Zápasů</h3>
+                <span class="close-modal"
+                    onclick="document.getElementById('modal-history').classList.remove('show')">&times;</span>
+            </div>
+
+            <div class="history-controls" style="margin-bottom: 15px; text-align: right;">
+                <button class="btn-secondary" onclick="historyManager.refresh()"><i
+                        class="material-icons-round">refresh</i> Obnovit</button>
+            </div>
+
+            <div class="table-responsive">
+                <table class="data-table" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Datum</th>
+                            <th>Zápas</th>
+                            <th>Skóre</th>
+                            <th>Akce</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-list">
+                        <!-- Loaded via JS -->
+                    </tbody>
+                </table>
+            </div>
+            <div id="history-loading" style="text-align:center; padding:20px; display:none;">
+                <span class="spinner"></span> Načítám...
+            </div>
+        </div>
+    </div>
+
+    <!-- ADMIN MODAL -->
+    <div id="modal-admin" class="modal" style="z-index: 100005;">
+        <div class="modal-content large-modal">
+            <h3>Administrace Uživatelů</h3>
+            <div style="margin-bottom: 15px; display: flex; justify-content: flex-end; gap: 10px; align-items: center;">
+                <select id="admin-filter-plan" onchange="authManager.renderUserList()"
+                    style="padding: 5px 10px; border: 1px solid #ccc; border-radius: 4px; background: #333; color: white;">
+                    <option value="all">Vše</option>
+                    <option value="pro">PRO</option>
+                    <option value="free">FREE</option>
+                </select>
+                <input type="number" id="admin-price-setter" placeholder="Cena (Kč)"
+                    style="padding: 5px 10px; width: 100px; border: 1px solid #f39c12; border-radius: 4px; background: #333; color: #f39c12; font-weight: bold;"
+                    onchange="authManager.adminSetPrice(this.value)">
+
+                <input type="text" id="admin-search-input" placeholder="🔍 Hledat email..."
+                    onkeyup="authManager.renderUserList()"
+                    style="padding: 5px 10px; width: 200px; border: 1px solid #ccc; border-radius: 4px; background: #333; color: white;">
+            </div>
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid #ddd; text-align: left;">
+                            <th style="padding: 10px;">Email</th>
+                            <th style="padding: 10px;">Plán</th>
+                            <th style="padding: 10px;">Expirace</th>
+                            <th style="padding: 10px; text-align: right;">Akce</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-user-list">
+                        <!-- JS renders rows here -->
+                    </tbody>
+                </table>
+            </div>
+            <button class="btn-secondary" onclick="document.getElementById('modal-admin').classList.remove('show')"
+                style="width: 100%; margin-top: 20px;">Zavřít</button>
+        </div>
+    </div>
+
+
+    <!-- EMAIL CONFIRMATION MODAL -->
+    <div id="modal-email-sent" class="modal"
+        style="display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.8); z-index: 200000;">
+        <div class="modal-content" style="max-width: 400px; text-align: center; border-radius: 12px; padding: 30px;">
+            <div style="font-size: 50px; color: #2ecc71; margin-bottom: 20px;">
+                <i class="material-icons-round" style="font-size: 60px;">mark_email_read</i>
+            </div>
+            <h3 style="margin-bottom: 10px;">Email Odeslán</h3>
+            <p style="color: #666; margin-bottom: 20px;" id="email-sent-msg">
+                Přihlašovací údaje byly odeslány na vaši adresu.
+            </p>
+
+            <!-- Hidden real details for user convenience if email fails -->
+            <div
+                style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: left; border: 1px solid #eee;">
+                <div style="font-size: 0.8rem; color: #999; margin-bottom: 5px;">KOPIE VAŠICH ÚDAJŮ:</div>
+                <div id="email-sent-details" style="font-family: monospace; font-size: 1rem; color: #333;"></div>
+            </div>
+
+            <button class="btn-primary" onclick="location.reload()" style="width: 100%;">Pokračovat</button>
+
+            <!-- FALLBACK MAILTO LINK (Invisible/Optional) -->
+            <a id="mailto-link" href="#" style="display: none;"></a>
+        </div>
+    </div>
+
+    <script src="app.js?v=2"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').then((registration) => {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                }, (err) => {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+    </script>
+<!-- MODAL: Penalty Selection -->
+<div id="modal-penalty-selection" class="modal" style="z-index: 10005;">
+    <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-header">
+            <h3>Vyber trest</h3>
+            <button class="btn-icon-close" onclick="match.closePenaltyModal()">
+                <i class="material-icons-round">close</i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="penalty-grid">
+                <button class="btn-penalty yellow" onclick="match.handlePenaltyAction('Žlutá karta')">Žlutá
+                    karta</button>
+                <button class="btn-penalty two-min" onclick="match.handlePenaltyAction('2min')">2 min</button>
+                <button class="btn-penalty red" onclick="match.handlePenaltyAction('Červená karta')">Červená
+                    karta</button>
+                <button class="btn-penalty blue" onclick="match.handlePenaltyAction('Modrá karta')">Modrá karta</button>
+            </div>
+        </div>
+    </div>
+</div><!-- MODAL: Technical Faults -->
+<div id="modal-tech-faults" class="modal" style="z-index: 10005;">
+    <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-header">
+            <h3>Vyber technickou chybu</h3>
+            <button class="btn-icon-close" onclick="match.closeTechnicalModal()">
+                <i class="material-icons-round">close</i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="penalty-grid">
+                <button class="btn-penalty" style="background: #95a5a6; color: white;"
+                    onclick="match.handleTechnicalAction('Přihrávkou')">Přihrávkou</button>
+                <button class="btn-penalty" style="background: #95a5a6; color: white;"
+                    onclick="match.handleTechnicalAction('Kroky')">Kroky</button>
+                <button class="btn-penalty" style="background: #95a5a6; color: white;"
+                    onclick="match.handleTechnicalAction('Přešlap')">Přešlap</button>
+                <button class="btn-penalty" style="background: #95a5a6; color: white;"
+                    onclick="match.handleTechnicalAction('Prorážení')">Prorážení</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: Payment Info -->
+<div id="modal-payment-info" class="modal" style="z-index: 100002;">
+    <div class="modal-content text-center" style="max-width: 450px; border-top: 5px solid #2ecc71;">
+        <h2 style="color: #2ecc71; margin-bottom: 20px;">Platba PRO verze</h2>
+
+        <div
+            style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 8px; margin-bottom: 20px; text-align: left;">
+            <p style="margin-bottom: 10px; font-size: 1.1rem;">
+                <strong>Částka:</strong> <span id="payment-amount" style="color: #f1c40f; font-size: 1.2rem;">60</span>
+                Kč / měsíc
+            </p>
+            <p style="margin-bottom: 10px; font-size: 1.1rem;">
+                <strong>Číslo účtu:</strong> <span
+                    style="font-family: monospace; font-size: 1.2rem;">1306878099/3030</span>
+            </p>
+            <p style="margin-bottom: 0; font-size: 0.9rem; color: #aaa;">
+                <strong>Zpráva pro příjemce:</strong> <br>
+                <span id="payment-email" style="color: white; font-weight: bold;">--</span>
+            </p>
+        </div>
+
+        <p style="color: #ccc; font-size: 0.9rem; margin-bottom: 20px;">
+            Po odeslání platby vyčkejte na aktivaci (cca 24h).
+        </p>
+
+        <button class="btn-primary" onclick="document.getElementById('modal-payment-info').classList.remove('show')"
+            style="width: 100%; border-radius: 30px; padding: 12px; font-size: 1.1rem;">
+            Rozumím
+        </button>
+    </div>
+</div>
+    <script>
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'cs',
+                includedLanguages: 'ja,ko,en,de,cs,fr,es,da,no,sv,hu',
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                autoDisplay: false
+            }, 'google_translate_element');
+        }
+
+        // Vlastní funkce pro přepínání jazyků přes vlaječky bez reloadu
+        function triggerGoogleTranslate(lang) {
+            if (!lang) return;
+            const googleSelect = document.querySelector('.goog-te-combo');
+            if (googleSelect) {
+                googleSelect.value = lang;
+                googleSelect.dispatchEvent(new Event('change'));
+            } else {
+                // Pojistka, pokud se Google modul ještě nenačetl
+                setTimeout(() => triggerGoogleTranslate(lang), 500);
+            }
+        }
+    </script>
+    <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <style>
+        /* Skrytí otravné horní lišty od Googlu a loga */
+        .goog-te-banner-frame.skiptranslate { display: none !important; }
+        body { top: 0px !important; }
+        .goog-logo-link { display:none !important; }
+        .goog-te-gadget { color: transparent !important; font-size: 0px !important; }
+        .goog-te-gadget .goog-te-combo { margin: 0px 0; color: #fff; background: #34495e; border: 1px solid #7f8c8d; border-radius: 4px; padding: 2px 5px; font-size: 0.8rem; font-family: 'Roboto', sans-serif;}
+    </style>
+</body>
+</html>

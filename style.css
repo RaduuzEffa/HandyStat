@@ -1,0 +1,4858 @@
+:root {
+    --primary: #4ecca3;
+    --primary-dim: #4ecca333;
+    --secondary: #393e46;
+    --bg: #232931;
+    --card-bg: #393e46;
+    --text: #eeeeee;
+    --text-muted: #bcc3c7;
+
+    --goal: #4ecca3;
+    --miss: #e74c3c;
+    --save: #f9ed69;
+    --info: #00adb5;
+
+    --font-main: 'Roboto', sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--font-main);
+    overflow: hidden;
+    /* App feel defaults for Desktop */
+    height: 100vh;
+}
+
+/* RESPONSIVE OVERFLOW: Enable scrolling on small screens */
+@media (max-width: 1024px) {
+    body {
+        overflow: auto;
+        height: auto;
+        min-height: 100vh;
+    }
+}
+
+/* Utils */
+.view {
+    display: none;
+    height: calc(100vh - 60px);
+    overflow-y: auto;
+    padding: 20px;
+    animation: fadeIn 0.3s ease;
+}
+
+.view.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.card {
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    margin-bottom: 20px;
+}
+
+/* Card headers */
+.card h2 {
+    text-align: center;
+    font-size: 1.1rem;
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 10px;
+}
+
+/* Nav */
+.top-nav {
+    height: 60px;
+    background: rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.nav-brand {
+    display: flex;
+    align-items: center;
+}
+
+.nav-logo {
+    height: 24px;
+    width: auto;
+    margin-right: 20px;
+    margin-left: 1px;
+}
+
+.brand-text {
+    font-weight: 900;
+    font-size: 1.5rem;
+    color: #fff;
+    letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    /* Space between title and subtitle */
+}
+
+.brand-gradient {
+    background: linear-gradient(to right, #8ae4cf, #3e15c3);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
+
+
+
+.player-btn {
+    background: var(--card-bg);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 15px 5px;
+    /* Layout */
+    display: flex;
+    align-items: center;
+    /* content centered via label flex */
+    overflow: hidden;
+    position: relative;
+    /* For safe measure */
+}
+
+.player-label {
+    flex: 1;
+    /* Take all space */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+    /* Center the text */
+    padding-left: 20px;
+    /* Balance the icon on right to keep text roughly visually centered? Or just 0. */
+    padding-right: 5px;
+}
+
+.player-icon {
+    flex: 0 0 auto;
+    /* Do not shrink */
+    font-size: 20px;
+    opacity: 0.7;
+    margin-left: auto;
+    /* Push to right if label wasn't flex 1, but it is. */
+    /* If label is flex:1, icon is just at the end. */
+}
+
+.player-btn:hover {
+    background: var(--nav-bg);
+    border-color: var(--primary);
+    transform: translateY(-2px);
+}
+
+.player-btn.active {
+    background: var(--primary);
+    color: #232931;
+    border-color: var(--primary);
+    box-shadow: 0 0 15px rgba(46, 204, 113, 0.4);
+}
+
+/* Ensure icon color adapts when active */
+.player-btn.active .player-icon {
+    color: #232931;
+    opacity: 1;
+}
+
+.nav-btn {
+    background: transparent;
+    border: 2px solid rgba(128, 128, 128, 0.5);
+    color: var(--text-muted);
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 10px 20px;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.nav-btn:hover {
+    color: var(--text);
+    border-color: var(--text);
+    transform: translateY(-2px);
+}
+
+/* Forms */
+label {
+    display: block;
+    margin: 0 0 8px 0;
+    padding: 0;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.label-note {
+    font-size: 0.8em;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 400;
+    margin-left: 8px;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    margin: 0;
+    height: 45px;
+    box-sizing: border-box;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text);
+    padding: 12px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 1rem;
+}
+
+#setup-home-name {
+    color: var(--primary);
+    font-weight: 700;
+}
+
+#setup-guest-name {
+    color: #e74c3c;
+    font-weight: 700;
+}
+
+textarea {
+    height: 150px;
+    resize: vertical;
+}
+
+.hint {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 9px;
+    font-weight: 400;
+}
+
+select {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='rgba(255, 255, 255, 0.7)'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 24px;
+    padding-right: 40px;
+    cursor: pointer;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-row {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.form-row .form-group {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+#setup-home-name,
+#setup-guest-name {
+    text-align: center;
+    font-weight: 700;
+}
+
+.columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+/* Buttons */
+button {
+    cursor: pointer;
+    font-family: inherit;
+    border: none;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: #232931;
+    font-weight: 700;
+    padding: 12px 24px;
+}
+
+.btn-primary:hover {
+    filter: brightness(1.1);
+    transform: translateY(-2px);
+}
+
+.btn-primary.large {
+    width: 100%;
+    padding: 20px;
+    font-size: 1.2rem;
+    margin-top: 20px;
+}
+
+.btn-secondary {
+    background: transparent;
+    border: 2px solid var(--text-muted);
+    color: var(--text-muted);
+    padding: 10px 20px;
+}
+
+/* Match Console */
+.scoreboard {
+    display: grid;
+    /* Responsive Grid: 3 columns on large, but flexible */
+    grid-template-columns: minmax(250px, 350px) 1fr minmax(200px, 250px);
+    /* Aligned with Match Grid */
+    gap: 20px;
+    background: var(--card-bg);
+    padding: 15px 0;
+    /* Remove side padding, grid handles it */
+    border-radius: 16px;
+    margin-bottom: 20px;
+    align-items: center;
+}
+
+@media (max-width: 1024px) {
+    .scoreboard {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto;
+        gap: 10px;
+        padding: 15px;
+        /* USER REQUEST: Vertically center timer (in column layout this implies horizontal center) */
+        justify-items: center;
+        text-align: center;
+    }
+
+    .scoreboard-inner {
+        grid-column: 1;
+        /* Reset to fill single column */
+        /* Timer logic */
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+.scoreboard-inner {
+    grid-column: 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    justify-items: center;
+    align-items: center;
+    width: 100%;
+}
+
+.team-score {
+    text-align: center;
+}
+
+/* Setup View Grid Layout */
+.setup-layout {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+    height: 100vh;
+    overflow: hidden;
+}
+
+@media (max-width: 1024px) {
+    .setup-layout {
+        display: flex;
+        flex-direction: column;
+        height: auto;
+        overflow: visible;
+    }
+
+    .setup-sidebar {
+        border-left: none;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+}
+
+.setup-main {
+    padding: 30px;
+    overflow-y: auto;
+}
+
+.setup-sidebar {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 30px;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    overflow-y: auto;
+}
+
+.saved-teams-grid.sidebar-list {
+    grid-template-columns: 1fr;
+    /* Single column in sidebar */
+}
+
+/* Team Manager styles reused/overridden */
+/* .team-manager-section removed/deprecated as we use direct sidebar now * Saved Teams Card */
+.team-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 20px;
+    /* Added spacing between cards */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.setup-main h1,
+.setup-main h2,
+.setup-sidebar h2,
+.setup-sidebar h3 {
+    margin-bottom: 12px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.saved-team-card h4 {
+    margin: 0 0 10px 0;
+    color: var(--primary);
+}
+
+.team-meta {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+}
+
+.team-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.btn-small {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+    border: none;
+    font-weight: 500;
+}
+
+.btn-load-home {
+    background: var(--primary);
+    color: #232931;
+}
+
+.btn-load-guest {
+    background: #e74c3c;
+    color: white;
+}
+
+.btn-delete {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-muted);
+}
+
+.btn-delete:hover {
+    background: #c0392b;
+    color: white;
+}
+
+.team-name {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+#sb-home-name {
+    color: var(--primary);
+}
+
+#sb-guest-name {
+    color: #e74c3c;
+}
+
+.score-value {
+    display: block;
+    font-size: 3rem;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.timer-display {
+    text-align: center;
+}
+
+.period-subtitle {
+    font-size: 0.7em;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 400;
+    margin-left: 8px;
+}
+
+.timer-display .time {
+    font-size: 2.5rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.timer-controls button {
+    background: none;
+    color: var(--text-muted);
+    padding: 5px;
+}
+
+.timer-controls button:hover {
+    color: var(--text);
+}
+
+.match-grid {
+    display: grid;
+    grid-template-columns: 25% 50% 25%;
+    width: 100%;
+    margin: 0 auto;
+    /* Players (Wide) - Court (Narrower) - Actions */
+    gap: 20px;
+    height: calc(100% - 130px);
+    /* Fill remaining height */
+}
+
+@media (max-width: 1024px) {
+    .match-grid {
+        display: flex;
+        flex-direction: column;
+        height: auto;
+    }
+
+    /* Fix Court Aspect Ratio on Mobile/Tablet */
+    .court-container {
+        width: 100%;
+        /* Force Aspect Ratio roughly standard handball court 1:1.6 or similar */
+        aspect-ratio: 1.4 / 1;
+        height: auto !important;
+        /* Override fixed pixels if any */
+    }
+
+    .panel.court-panel {
+        height: auto;
+        min-height: auto;
+    }
+
+    /* USER REQUEST: Tablet Portrait 4 Columns for Players */
+    .player-grid.unified-grid {
+        grid-template-columns: repeat(4, 1fr) !important;
+    }
+
+    /* Ensure action buttons are visible */
+    .defense-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        /* 3 cols for buttons on mobile? */
+        gap: 10px;
+    }
+}
+
+/* --- PLAYERS PANEL --- */
+.players-panel {
+    background: #232931;
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.roster-section.unified-roster {
+    margin-top: 10px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+    /* For inner scroll */
+}
+
+/* Control Bar */
+.roster-controls {
+    display: flex;
+    justify-content: flex-end;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #393e46;
+    margin-bottom: 8px;
+}
+
+.btn-sub-out {
+    background: transparent;
+    border: 1px solid #e74c3c;
+    color: #e74c3c;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.btn-sub-out:hover {
+    background: rgba(231, 76, 60, 0.1);
+}
+
+.btn-sub-out.active {
+    background: #e74c3c;
+    color: white;
+}
+
+/* Unified Grid */
+.player-grid.unified-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    /* 2 Columns */
+    gap: 8px;
+    overflow-y: auto;
+    align-content: start;
+    /* Don't stretch */
+    padding-right: 2px;
+    /* Scrollbar space */
+    /* Removed max-height, flex parent handles it */
+}
+
+/* Player Button Styles - Refined */
+.player-btn {
+    background: #1e2329 !important;
+    /* Forces black/dark from original styles override if needed */
+    border: 1px solid #393e46;
+    color: #ecf0f1;
+    border-radius: 4px;
+    min-height: 44px;
+    /* Slightly taller */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    user-select: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.1s;
+    position: relative;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.player-btn:hover {
+    background: #2c343f !important;
+}
+
+/* ON COURT STATE - Green Border */
+.player-btn.on-court {
+    border: 2px solid #2ecc71;
+    background: #1e2329 !important;
+    /* Keep dark bg */
+}
+
+/* SELECTED STATE (Action context) - Full Green */
+.player-btn.active {
+    background: #2ecc71 !important;
+    border-color: #2ecc71 !important;
+    color: white !important;
+    font-weight: bold;
+    transform: scale(0.98);
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Removed old definitions for court-grid/bench-players */
+
+.player-number {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.player-name {
+    display: block;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Center: Court */
+.court-container {
+    /* Fixed Aspect Ratio for centering */
+    width: 100%;
+    aspect-ratio: 1.8 / 1;
+    /* Standard 40x20 is 2:1, but screens are limited. 1.8 is good balance */
+    flex: 0 0 auto;
+    /* Do not stretch */
+
+    position: relative;
+    background: #2151A8;
+    /* User Requested Dark Blue */
+    border-radius: 8px;
+    border: 2px solid #fff;
+    overflow: hidden;
+    margin-bottom: 0;
+    /* Remove margin as we center it */
+    box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.5);
+}
+
+/* Bench unified with Court */
+
+
+
+/* Guest Team Red Theme */
+#btn-team-guest.active,
+#stat-toggle-guest.active {
+    background: #e74c3c !important;
+    /* Red */
+    color: white !important;
+}
+
+/* Context-aware player active state */
+.player-grid[data-active-team="home"] .player-btn.active {
+    border-color: var(--primary);
+    background: transparent;
+    /* Changed from var(--primary-dim) */
+    box-shadow: inset 0 0 0 1px var(--primary);
+    /* Optional: extra internal border for visibility? Or just border-color */
+    /* User said "original bordering". If the original was just border-color, simpler is better. */
+    /* Let's just unset background. */
+}
+
+.player-grid[data-active-team="guest"] .player-btn.active {
+    border-color: #e74c3c;
+    background: transparent;
+    /* Changed from rgba(231, 76, 60, 0.4) */
+}
+
+/* Visual Goal Structure */
+.goal-structure {
+    position: absolute;
+    top: 6.7%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 28.6%;
+    height: 37%;
+    /* Scaled by 1.15 again */
+    border: none;
+
+    /* 3 Tyče: Levá (5 pruhů), Pravá (5 pruhů), Břevno (7 pruhů) */
+    background:
+        /* Left Post: R-W-R-W-R (20% each) */
+        linear-gradient(to bottom,
+            #e74c3c 0% 20%,
+            #ffffff 20% 40%,
+            #e74c3c 40% 60%,
+            #ffffff 60% 80%,
+            #e74c3c 80% 100%) left top / 16px 100% no-repeat,
+
+        /* Right Post: R-W-R-W-R (20% each) */
+        linear-gradient(to bottom,
+            #e74c3c 0% 20%,
+            #ffffff 20% 40%,
+            #e74c3c 40% 60%,
+            #ffffff 60% 80%,
+            #e74c3c 80% 100%) right top / 16px 100% no-repeat,
+
+        /* Crossbar: R-W-R-W-R-W-R (7 segments ~14.28% each) */
+        linear-gradient(to right,
+            #e74c3c 0% 14.28%,
+            #ffffff 14.28% 28.56%,
+            #e74c3c 28.56% 42.84%,
+            #ffffff 42.84% 57.12%,
+            #e74c3c 57.12% 71.4%,
+            #ffffff 71.4% 85.68%,
+            #e74c3c 85.68% 100%) center top / 100% 16px no-repeat,
+
+        /* Grid Vertical (33.33%, 66.66%) */
+        linear-gradient(to right,
+            transparent 33.33%,
+            rgba(255, 255, 255, 0.4) 33.33%, rgba(255, 255, 255, 0.4) calc(33.33% + 1px),
+            transparent calc(33.33% + 1px),
+            transparent 66.66%,
+            rgba(255, 255, 255, 0.4) 66.66%, rgba(255, 255, 255, 0.4) calc(66.66% + 1px),
+            transparent calc(66.66% + 1px)) center bottom / calc(100% - 32px) calc(100% - 16px) no-repeat,
+
+        /* Grid Horizontal (33.33%, 66.66%) */
+        linear-gradient(to bottom,
+            transparent 33.33%,
+            rgba(255, 255, 255, 0.4) 33.33%, rgba(255, 255, 255, 0.4) calc(33.33% + 1px),
+            transparent calc(33.33% + 1px),
+            transparent 66.66%,
+            rgba(255, 255, 255, 0.4) 66.66%, rgba(255, 255, 255, 0.4) calc(66.66% + 1px),
+            transparent calc(66.66% + 1px)) center bottom / calc(100% - 32px) calc(100% - 16px) no-repeat;
+
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    z-index: 50;
+    /* Raise above sector-zones (20) */
+    pointer-events: auto;
+    /* Catch clicks on posts/structure */
+    cursor: pointer;
+    /* Feedback that it's clickable (even if just warning) */
+}
+
+/* Goal Grid Watermarks */
+.goal-grid-numbers {
+    position: absolute;
+    top: 7.8%;
+    left: 14%;
+    right: 14%;
+    bottom: 4.8%;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    pointer-events: auto;
+    /* Enable Clicks */
+    z-index: 50;
+    /* Raise above sector-zones (20) */
+}
+
+.goal-grid-numbers div {
+    position: relative;
+    /* For absolute markers if needed, or flex centering */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 10px;
+    font-weight: bold;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: background-color 0.1s;
+}
+
+.goal-grid-numbers div:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Flash Animation for Interactive Grid */
+@keyframes flash-white {
+    0% {
+        background-color: rgba(255, 255, 255, 0.8);
+    }
+
+    100% {
+        background-color: transparent;
+    }
+}
+
+.active-flash {
+    animation: flash-white 0.3s ease-out;
+}
+
+/* Basic Court Lines (CSS Graphics) */
+.goal-area {
+    position: absolute;
+    top: -5%;
+    left: 10%;
+    right: 10%;
+    bottom: 45%;
+    border: 3px solid #fff;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: 3px solid #fff;
+    border-radius: 0 0 100% 100%;
+    background: #75D0F3;
+    /* User Requested Light Blue */
+    opacity: 0.3;
+    z-index: 50;
+    /* Raise above sector-zones */
+    pointer-events: auto;
+    /* Catch clicks in goal area */
+}
+
+.nine-meter-line {
+    position: absolute;
+    top: 16.6%;
+    /* Moved lower proportionally */
+    left: 0;
+    right: 0;
+    height: 60%;
+    /* Use height instead of bottom for better control of arc depth */
+    border: 3px dashed #fff;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: 3px dashed #fff;
+    border-radius: 0 0 100% 100%;
+}
+
+.seven-meter-line {
+    position: absolute;
+    top: 60%;
+    /* Between 6m (55%) and 9m (>65%) */
+    left: 50%;
+    width: 20px;
+    height: 3px;
+    background: #fff;
+    transform: translateX(-50%);
+}
+
+.court-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10;
+    cursor: crosshair;
+}
+
+/* Ensure Sector Labels are Interactive ABOVE Overlay */
+.sector-labels {
+    z-index: 20 !important;
+    /* Higher than Overlay */
+}
+
+.sector-label {
+    pointer-events: auto !important;
+    z-index: 21 !important;
+}
+
+.court-watermark {
+    position: absolute;
+    bottom: 15px;
+    right: 20px;
+    width: 70px;
+    opacity: 0.7;
+    z-index: 5;
+    pointer-events: none;
+    user-select: none;
+    /* Silver/Studio Light Effect */
+    filter: grayscale(100%) brightness(150%) drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.shot-marker {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    /* background: red; Removed default red to use classes */
+    border-radius: 50%;
+    border: 2px solid #fff;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 60;
+    /* Ensure visibility above Court Overlay (10) and Zones (20) */
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.goal-marker {
+    position: absolute;
+    /* or static if flex centered */
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 1px solid white;
+    z-index: 10;
+    pointer-events: none;
+    flex-shrink: 0;
+    /* Prevent squashing in flex container */
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.marker-green {
+    background-color: #2ecc71;
+    /* Gól */
+}
+
+.marker-red {
+    background-color: #e74c3c;
+    /* Obdržený */
+}
+
+.marker-purple {
+    background-color: #8e44ad;
+    /* Zákrok / Chyceno */
+}
+
+.marker-yellow {
+    background-color: #f1c40f;
+    /* Jiné */
+}
+
+.marker-grey {
+    background-color: #95a5a6;
+    /* Mimo */
+}
+
+@keyframes popIn {
+    from {
+        transform: translate(-50%, -50%) scale(0);
+    }
+
+    to {
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+/* Court Sectors */
+.sector-lines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 3;
+    overflow: hidden;
+    /* Mask inner part (Goal Area) so lines start at 6m line */
+    -webkit-mask-image: radial-gradient(ellipse at 50% -5%, transparent 60%, black 61%);
+    mask-image: radial-gradient(ellipse at 50% -5%, transparent 60%, black 61%);
+}
+
+.sector-line {
+    position: absolute;
+    top: 5%;
+    /* Origin at Goal */
+    left: 50%;
+    width: 1px;
+    height: 150%;
+    /* Long enough to reach corners */
+    background: rgba(255, 255, 255, 0.3);
+    /* Thin, semi-transparent */
+    transform-origin: top center;
+}
+
+.sector-line.line-1 {
+    transform: rotate(-65deg);
+}
+
+/* Left Wing Boundary */
+.sector-line.line-2 {
+    transform: rotate(-25deg);
+}
+
+/* Left Back Boundary */
+.sector-line.line-3 {
+    transform: rotate(25deg);
+}
+
+/* Right Back Boundary */
+.sector-line.line-4 {
+    transform: rotate(65deg);
+}
+
+.center-line {
+    position: absolute;
+    /* Start at 6m line vertex (Goal Area bottom: 45% -> 55% from top) */
+    top: 55%;
+    left: 50%;
+    width: 1px;
+    height: 21.6%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateX(-50%);
+    pointer-events: none;
+    z-index: 3;
+}
+
+/* Sector Labels */
+.sector-labels {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 100;
+    z-index: 100;
+    /* Ensure it is ABOVE court-overlay (10) and goal-grid (11) */
+}
+
+/* Sector Interaction Zones */
+.sector-zones {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    /* Container passes clicks */
+    z-index: 20;
+    /* Above Court Overlay (10) but below Labels (100) */
+}
+
+.sector-zone {
+    position: absolute;
+    pointer-events: auto;
+    /* Zones catch clicks */
+    cursor: pointer;
+    /* background: rgba(255, 0, 0, 0.2); Debugging: Visible */
+}
+
+/* Zone Positions */
+.z-lw {
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 15%;
+}
+
+.z-rw {
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 15%;
+}
+
+.z-lb {
+    top: 60%;
+    bottom: 0;
+    left: 15%;
+    width: 28%;
+}
+
+.z-cb {
+    top: 60%;
+    bottom: 0;
+    left: 43%;
+    width: 14%;
+}
+
+.z-rb {
+    top: 60%;
+    bottom: 0;
+    right: 15%;
+    width: 28%;
+}
+
+.z-lp {
+    top: 20%;
+    height: 40%;
+    left: 15%;
+    width: 35%;
+}
+
+.z-rp {
+    top: 20%;
+    height: 40%;
+    right: 15%;
+    width: 35%;
+}
+
+.sector-label {
+    position: absolute;
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.15);
+    /* Faint Watermark */
+    text-transform: uppercase;
+    white-space: nowrap;
+
+    /* Interactive */
+    pointer-events: auto;
+    /* Enable clicking */
+    cursor: pointer;
+    transition: color 0.2s, text-shadow 0.2s;
+}
+
+.sector-label:hover {
+    color: #fff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+}
+
+/* Sektor 1 (Left Wing) */
+.sector-label.s1 {
+    top: 20%;
+    left: 5%;
+    transform: translate(-50%, -50%) rotate(-90deg);
+}
+
+/* Sektor 2 (Left Back - Bottom Left) */
+.sector-label.s2 {
+    top: calc(85% + 32px);
+    left: calc(20% - 128px);
+    transform: translate(-50%, -50%);
+}
+
+/* Sektor 3 (Center Back - Bottom Center) */
+.sector-label.s3 {
+    top: calc(85% + 32px);
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Sektor 4 (Right Back - Bottom Right) */
+.sector-label.s4 {
+    top: calc(85% + 32px);
+    right: calc(20% - 128px);
+    transform: translate(50%, -50%);
+}
+
+/* Sektor 5 (Right Wing - Top Right) */
+.sector-label.s5 {
+    top: 20%;
+    right: 5%;
+    transform: translate(50%, -50%) rotate(-90deg);
+}
+
+/* Sektor 6 (Right 6m-9m) */
+.sector-label.s6 {
+    display: block;
+    top: 60%;
+    right: 25%;
+    transform: translate(50%, -50%);
+}
+
+/* Sektor 7 (Left 6m-9m) */
+.sector-label.s7 {
+    display: block;
+    top: 60%;
+    left: 25%;
+    transform: translate(-50%, -50%);
+}
+
+/* Right Wing Boundary */
+
+.action-logs {
+    height: 100px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 0.85rem;
+    overflow-y: auto;
+    font-family: monospace;
+}
+
+.log-item {
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Right: Buttons */
+.action-buttons {
+    display: grid;
+    /* grid-template-columns: 1fr 1fr;  <-- REMOVED to revert to stack */
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.split-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.split-row .btn-action {
+    padding: 0;
+    height: 42px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-action {
+    padding: 20px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fff;
+    border-radius: 8px;
+}
+
+/* Reduced size for Penalty buttons */
+.small-grid .btn-action {
+    padding: 0 5px;
+    font-size: 0.9rem;
+    min-height: auto;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.actions-panel h3 {
+    margin-bottom: 12px;
+}
+
+.btn-action.goal {
+    background: var(--goal);
+    color: #232931;
+}
+
+.btn-action.save,
+.btn-action.miss,
+.btn-action.post,
+.btn-action.two-min {
+    background: rgba(255, 107, 107, 0.25);
+    /* Light Red 25% */
+    color: #fff;
+    border: 1px solid rgba(255, 107, 107, 0.3);
+}
+
+.small-grid {
+    grid-template-columns: 1fr 1fr;
+}
+
+.btn-action.yellow {
+    background: #feca57;
+    color: #000;
+}
+
+/* .btn-action.two-min removed from here as it is now grouped with post/miss */
+
+.btn-action.blue {
+    background: #3498db;
+    /* Blue */
+}
+
+.btn-action.red {
+    background: #ff4757;
+}
+
+.btn-action.turn {
+    background: #576574;
+}
+
+/* Dashboard Tables */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.data-table th,
+.data-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text);
+    font-size: 14px;
+    /* Request: 14px */
+}
+
+/* Table Column Widths & Spacing */
+.data-table th:nth-child(1),
+.data-table td:nth-child(1) {
+    width: 8%;
+    font-size: 0.75em;
+    /* Closer to 30% reduction */
+}
+
+.data-table th:nth-child(2),
+.data-table td:nth-child(2) {
+    width: 20%;
+    /* Increased for 12 chars */
+    padding-right: 20px;
+    /* Separation */
+}
+
+.data-table th:nth-child(3) {
+    width: 39%;
+    /* Decreased to compensate */
+}
+
+.data-table th:nth-child(4) {
+    width: 18%;
+}
+
+.data-table th:nth-child(5) {
+    width: 15%;
+}
+
+.data-table th {
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.row-home {
+    color: var(--primary);
+    /* Greenish */
+}
+
+.row-guest {
+    color: #e74c3c;
+    /* Red */
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .match-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto;
+        height: auto;
+    }
+
+    .court-container {
+        height: auto;
+    }
+
+    .player-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* Stats Toggle (Segmented Control) */
+.stats-toggle {
+    display: flex;
+    justify-content: center;
+    background: var(--card-bg);
+    padding: 5px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.stats-toggle button {
+    flex: 1;
+    background: transparent;
+    color: var(--text-muted);
+    padding: 10px;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.stats-toggle button.active {
+    background: var(--primary);
+    color: #232931;
+    font-weight: 700;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Modal Styling */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    /* Ensure it is on top of everything */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.open {
+    display: flex;
+}
+
+.modal-content {
+    background: #2c3e50;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #fff;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 10px;
+}
+
+.close-modal {
+    font-size: 28px;
+    cursor: pointer;
+    color: #aaa;
+}
+
+.close-modal:hover {
+    color: #fff;
+}
+
+.selection-list {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.add-player-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.add-player-row input {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 8px;
+    border-radius: 4px;
+    color: white;
+}
+
+.add-player-row .btn-icon-add {
+    background: #27ae60;
+    border: none;
+    border-radius: 4px;
+    width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: white;
+}
+
+.selection-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    /* Content Left, Delete Right */
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+}
+
+.selection-item.selected {
+    background: rgba(46, 204, 113, 0.2);
+    border-color: #2ecc71;
+}
+
+.selection-item:not(.selected) {
+    opacity: 0.8;
+    /* Keep legible for editing */
+    background: rgba(0, 0, 0, 0.2);
+}
+
+/* Clickable Area for Toggling */
+.selection-content {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    cursor: pointer;
+}
+
+.selection-content span {
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+/* Delete Button */
+.selection-actions {
+    margin-left: 10px;
+}
+
+.btn-icon-delete {
+    background: transparent;
+    border: none;
+    color: rgba(231, 76, 60, 0.5);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+}
+
+.btn-icon-delete:hover {
+    color: #e74c3c;
+    background: rgba(231, 76, 60, 0.1);
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 15px;
+}
+
+/* Custom Confirmation Modal */
+.confirm-content {
+    max-width: 400px;
+    text-align: center;
+    background-color: #393e46;
+    /* Matching Card BG */
+    border-color: var(--text-muted);
+    /* Light Grey Border */
+}
+
+.confirm-content h3 {
+    color: var(--text-muted);
+    /* Light Grey Text */
+    font-size: 1.5rem;
+    margin-bottom: 5px;
+}
+
+.btn-gray {
+    background-color: var(--text-muted);
+    /* Light Grey Button */
+    color: #232931;
+    /* Dark text */
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+}
+
+.btn-gray:hover {
+    filter: brightness(1.1);
+}
+
+.text-danger {
+    color: #e74c3c;
+    margin-bottom: 0;
+}
+
+#confirm-message {
+    font-size: 1.1rem;
+    margin: 20px 0;
+    color: white;
+}
+
+.btn-danger {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 700;
+    text-transform: uppercase;
+    transition: all 0.2s;
+}
+
+.btn-danger:hover {
+    background: #c0392b;
+}
+
+.btn-yellow {
+    background: #f1c40f;
+    color: #232931;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 700;
+    text-transform: uppercase;
+    transition: all 0.2s;
+}
+
+.btn-yellow:hover {
+    background: #f39c12;
+}
+
+.btn-yellow:hover {
+    background: #f39c12;
+}
+
+.btn-purple {
+    background: #9b59b6;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 700;
+    text-transform: uppercase;
+    transition: all 0.2s;
+}
+
+.btn-purple:hover {
+    background: #8e44ad;
+}
+
+.team-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+.team-header strong {
+    font-weight: 700;
+    color: white;
+}
+
+.header-separator {
+    color: rgba(255, 255, 255, 0.4);
+    margin: 0 4px;
+}
+
+.player-count-text {
+    font-weight: 300;
+    /* Thin font */
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.85rem;
+}
+
+/* Sidebar Team Actions Compact */
+.team-actions {
+    display: flex;
+    gap: 4px;
+    /* Tight gap */
+    margin-top: 10px;
+}
+
+.team-actions button {
+    padding: 8px 6px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    border-radius: 4px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    white-space: nowrap;
+    /* Prevent wrapping */
+}
+
+.team-actions button:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+}
+
+/* 1. Vyber hráče (White Text Button) */
+.team-actions button.btn-select {
+    background: #fff;
+    color: #2c3e50;
+    flex: 1;
+    text-transform: none;
+    /* Share space */
+}
+
+/* 2. Načíst Domácí (Green) */
+.team-actions button.btn-load-home {
+    background: #27ae60;
+    flex: 1.2;
+    text-transform: none;
+    /* Slightly wider for text */
+}
+
+/* 3. Načíst Hosté (Red) */
+.team-actions button.btn-load-guest {
+    background: #c0392b;
+    flex: 1.2;
+    text-transform: none;
+    /* Slightly wider for text */
+}
+
+/* 4. Smazat (Subtle Outline Icon) */
+.team-actions button.btn-delete-subtle {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.6);
+    width: 28px;
+    flex: 0 0 28px;
+    /* Fixed small width */
+    padding: 0;
+}
+
+.team-actions button.btn-delete-subtle i {
+    font-size: 18px;
+    /* Smaller icon */
+}
+
+.team-actions button.btn-delete-subtle:hover {
+    background: rgba(231, 76, 60, 0.2);
+    border-color: #e74c3c;
+    color: #e74c3c;
+}
+
+/* Dashboard Header Layout */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.dashboard-controls {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+/* Header Stat Widgets (Compact) */
+.header-stat {
+    text-align: center;
+    /* Optional: background for widget 
+    background: var(--card-bg);
+    padding: 10px 20px;
+    border-radius: 8px; */
+}
+
+.header-stat h3 {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    /* Smaller label */
+    /* text-transform: uppercase; REMOVED */
+    margin-bottom: 5px;
+}
+
+.header-stat .big-number {
+    font-size: 2rem;
+    /* Smaller than full page stat */
+    font-weight: 700;
+    color: var(--primary);
+    line-height: 1;
+}
+
+/* Force Identical Styling for Efficiency Labels */
+#lbl-shot-eff,
+#lbl-save-eff {
+    font-size: 0.85rem !important;
+    font-weight: 400 !important;
+    /* Ensure same weight */
+    color: var(--text-muted) !important;
+    margin-bottom: 5px !important;
+    text-transform: none !important;
+    /* Prevent case diffs */
+    letter-spacing: normal !important;
+}
+
+/* Remove old stats-toggle styles if they conflict, 
+   but since we reused 'team-toggle' class, we use that instead. */
+.stats-toggle {
+    display: none;
+}
+
+.stats-summary {
+    display: none;
+}
+
+/* Guest Mode Stats Red */
+.guest-mode .big-number {
+    color: #e74c3c !important;
+}
+
+/* Roster Sections */
+.roster-section {
+    margin-bottom: 20px;
+}
+
+.roster-section h4 {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    padding-left: 5px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 5px;
+}
+
+/* Player Button (New Layout) */
+/* Overriding existing .player-btn to be a flex container for info + move icon */
+.player-btn {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0;
+    /* Clear padding, inner divs handle it */
+    overflow: hidden;
+}
+
+.player-info {
+    flex: 1;
+    padding: 12px 15px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Roster Input Grid */
+.roster-rows-container {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 8px;
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.roster-row {
+    display: grid;
+    grid-template-columns: 50px 1fr 60px;
+    gap: 8px;
+    align-items: center;
+}
+
+/* Input modifiers for roster row */
+.roster-row input {
+    margin-bottom: 0 !important;
+    /* Override global input margin if any */
+    padding: 8px !important;
+    font-size: 0.85rem;
+    height: 36px !important;
+}
+
+.roster-row select {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    border-radius: 4px;
+    padding: 0;
+    font-size: 14px;
+    /* User Requested 14px */
+    cursor: pointer;
+    text-align: center;
+    text-align-last: center;
+    height: 100%;
+    min-height: 36px;
+    appearance: none;
+    /* Might need to restore default arrow or use custom */
+}
+
+/* Revert placeholder small size trick since we use standard 14px now */
+.roster-row select.placeholder {
+    font-size: 14px;
+}
+
+.roster-row select option {
+    font-size: 14px;
+    /* User Requested 14px */
+    background: #2c3e50;
+    color: white;
+}
+
+.roster-row select:focus {
+    border-color: var(--primary);
+    outline: none;
+}
+
+.btn-sm-add {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    color: var(--text-muted);
+    width: 100%;
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+
+.btn-sm-add:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.player-move {
+    width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    align-self: stretch;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.player-move:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.player-move i {
+    color: var(--text-muted);
+}
+
+.player-btn.active .player-move {
+    border-left-color: rgba(255, 255, 255, 0.2);
+}
+
+.player-btn.active .player-move i {
+    color: white;
+}
+
+/* Improved Roster Spacing */
+.player-btn,
+.player-label {
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.roster-section {
+    margin-bottom: 40px !important;
+    /* Force override if needed or just update */
+}
+
+/* Custom Notification Toast */
+/* Notification Area (Global) */
+#notification-area {
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2000;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.notification-toast {
+    position: relative;
+    /* Relative to container (which is absolute in court, fixed in global) */
+    background: #e74c3c;
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    pointer-events: auto;
+    width: max-content;
+    max-width: 90vw;
+}
+
+.notification-toast.success {
+    background: #55efc4;
+    /* Light Green */
+    color: #2d3436;
+    /* Dark Text */
+    box-shadow: 0 4px 12px rgba(85, 239, 196, 0.3);
+}
+
+.notification-toast.guest-success {
+    background: #e74c3c;
+    /* Red */
+    color: #fff;
+    /* White Text */
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+}
+
+.notification-toast.show {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+}
+
+.notification-toast i {
+    font-size: 1.2rem;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    padding: 4px;
+}
+
+/* Style Date/Time Picker Icons */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.6);
+    /* Makes black icon gray/light */
+    cursor: pointer;
+    margin-right: 4px;
+    /* Shift left by 4px */
+}
+
+input:focus,
+textarea:focus {
+    border-color: var(--primary);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* Placeholders for Fixed Layout */
+.player-btn.placeholder {
+    background: transparent;
+    border: 2px dashed rgba(255, 255, 255, 0.1);
+    box-shadow: none;
+    pointer-events: none;
+    /* Let drops pass through to container */
+    min-height: 60px;
+    /* Match standard button */
+}
+
+/* Ensure grids have drop target area even if empty */
+.player-grid {
+    min-height: 150px;
+    border: 2px solid transparent;
+    transition: all 0.2s;
+    border-radius: 8px;
+}
+
+.player-grid.drag-over {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--primary);
+}
+
+.guest-mode .player-grid.drag-over {
+    border-color: #e74c3c;
+}
+
+.guest-mode .player-btn.active {
+    background: #e74c3c;
+    border-color: #e74c3c;
+    color: #fff;
+    box-shadow: 0 0 15px rgba(231, 76, 60, 0.4);
+}
+
+.guest-mode .player-btn.active .player-icon {
+    color: #fff;
+}
+
+.guest-mode .player-btn:hover {
+    border-color: #e74c3c;
+}
+
+/* Player Font Colors by Zone */
+/* Home Team on Court - Light Green */
+.court-grid .player-label {
+    color: #55efc4;
+    font-weight: 700;
+}
+
+/* Guest Team on Court - Light Red */
+.guest-mode .court-grid .player-label {
+    color: #ff7675;
+}
+
+/* Bench - White (Default) */
+.bench-players .player-label {
+    color: #fff;
+    font-weight: 400;
+    /* Optional: differentiate weight too? User didn't ask, but looks good. Keep it normal if user didn't ask. */
+}
+
+/* Updates for Modal Structured Input */
+.add-player-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    margin-bottom: 12px;
+}
+
+/* Ensure the roster row inside modal expands */
+.add-player-row .roster-row {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+/* GK Slot Highlighting - Only for Reserved Placeholder */
+.players-panel[data-active-team="home"] .court-grid>.placeholder.gk-reserved {
+    background-color: rgba(46, 204, 113, 0.2);
+    border-color: rgba(46, 204, 113, 0.5);
+}
+
+.players-panel[data-active-team="guest"] .court-grid>.placeholder.gk-reserved {
+    background-color: rgba(231, 76, 60, 0.2);
+    border-color: rgba(231, 76, 60, 0.5);
+}
+
+/* Ensure placeholder styling blends or overrides cleanly */
+.players-panel[data-active-team="home"] .court-grid .placeholder.gk-reserved {
+    background-color: rgba(46, 204, 113, 0.1);
+    border: 1px dashed rgba(46, 204, 113, 0.4);
+}
+
+.players-panel[data-active-team="guest"] .court-grid .placeholder.gk-reserved {
+    background-color: rgba(231, 76, 60, 0.1);
+    border: 1px dashed rgba(231, 76, 60, 0.4);
+}
+
+/* GK Slot Watermark - Only on Reserved Placeholder */
+.players-panel .court-grid .placeholder.gk-reserved::before {
+    content: "GK";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.15);
+    /* Almost transparent */
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Ensure player content sits above watermark */
+.player-btn .player-label {
+    position: relative;
+    z-index: 1;
+}
+
+/* GK Selection Modal Styling */
+/* GK Selection Modal Styling - Enlarged */
+.small-modal {
+    max-width: 450px !important;
+    text-align: center;
+}
+
+.action-list {
+    margin: 20px 0;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.btn-full {
+    width: 100%;
+    text-align: left;
+    padding: 20px;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.5rem;
+    /* Bigger font for easier selection */
+    font-weight: 600;
+}
+
+/* Ensure placeholder cursor */
+.gk-reserved {
+    cursor: pointer !important;
+}
+
+.gk-reserved:hover {
+    border-style: solid !important;
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Remove Pseudo-element Watermark since we use real HTML now */
+.players-panel .court-grid .placeholder.gk-reserved::before {
+    content: none !important;
+}
+
+/* Style for Explicit GK Placeholder Content */
+.gk-placeholder-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: rgba(255, 255, 255, 0.4);
+    pointer-events: none;
+    /* Let clicks pass to parent placeholder */
+}
+
+.gk-text {
+    font-size: 1.4rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.gk-placeholder-content i {
+    font-size: 1.2rem;
+    margin-top: -2px;
+}
+
+/* Hover effect */
+.gk-reserved:hover .gk-placeholder-content {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* STARTUP OVERLAY */
+.startup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #0f1623;
+    /* Dark Background */
+    z-index: 99999;
+    /* Top most */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.startup-content {
+    background: #2c3e50;
+    padding: 40px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    max-width: 500px;
+}
+
+/* Added missing closing brace for .startup-content rules */
+
+.large-modal {
+    max-width: none;
+    width: 99vw;
+    /* To handle potential height issues if content is huge, we let the internal div scroll */
+}
+
+.startup-content h1 {
+    font-size: 2rem;
+    margin-bottom: 16px;
+    color: white;
+}
+
+.startup-content p {
+    color: var(--text-muted);
+    margin-bottom: 24px;
+    font-size: 1.1rem;
+}
+
+.startup-content .small-hint {
+    font-size: 0.9rem;
+    opacity: 0.7;
+    margin-bottom: 32px;
+}
+
+.startup-content .btn-primary {
+    font-size: 1.2rem;
+    padding: 12px 32px;
+    width: 100%;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.startup-overlay.hidden {
+    display: none;
+}
+
+/* GK Specific Slots */
+.player-btn.gk-slot {
+    position: relative;
+    /* Context for watermark */
+    overflow: hidden;
+    /* Contain watermark */
+}
+
+.player-btn.gk-slot-home {
+    background-color: rgba(78, 204, 163, 0.2);
+    /* Transparent Green */
+    border: 1px solid var(--primary);
+}
+
+/* MODAL STYLES (Explicit Definition) */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 10000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+@media print {
+    @page {
+        margin: 1cm;
+        size: auto;
+    }
+
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    body {
+        background: white !important;
+        color: black !important;
+        height: auto !important;
+        overflow: visible !important;
+    }
+
+    /* --- COMMON HIDES --- */
+    .top-nav,
+    .dashboard-controls,
+    .export-actions,
+    .btn-danger,
+    .btn-primary,
+    .btn-secondary,
+    .btn-action,
+    .defense-grid,
+    .view:not(.active),
+    #startup-overlay,
+    .half-toggles,
+    .btn-icon-close,
+    .modal-actions {
+        display: none !important;
+    }
+
+    /* --- MODE 1: STATS MODAL PRINT --- */
+    /* Active when body has 'print-stats-modal' class (added by JS) */
+
+    body.print-stats-modal>*:not(#modal-match-stats) {
+        display: none !important;
+    }
+
+    body.print-stats-modal #modal-match-stats {
+        display: block !important;
+        position: relative !important;
+        width: 100% !important;
+        height: auto !important;
+        background: white !important;
+        border: none !important;
+        left: 0 !important;
+        top: 0 !important;
+        z-index: 99999;
+    }
+
+    body.print-stats-modal #modal-match-stats .modal-content {
+        box-shadow: none !important;
+        border: none !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        background: white !important;
+        color: black !important;
+    }
+
+    /* Force text to black within modal but allow specific overrides if needed */
+    /* Removed aggressive universal selector that might kill graphics */
+    /* --- FORCE WHITE BACKGROUND RECURSIVELY --- */
+    body.print-stats-modal #modal-match-stats * {
+        background-color: transparent !important;
+        /* Default to transp so white shines through */
+        color: black !important;
+        text-shadow: none !important;
+        box-shadow: none !important;
+    }
+
+    /* Container Background */
+    body.print-stats-modal #modal-match-stats,
+    body.print-stats-modal #modal-match-stats .modal-content,
+    body.print-stats-modal #modal-match-stats .modal-header,
+    body.print-stats-modal #modal-match-stats .modal-footer,
+    body.print-stats-modal #modal-match-stats .modal-body {
+        background-color: white !important;
+        color: black !important;
+        border: none !important;
+    }
+
+    /* Re-enable semantic colors for badges/markers only & Cards */
+    body.print-stats-modal #modal-match-stats .badge,
+    body.print-stats-modal #modal-match-stats .shot-marker,
+    body.print-stats-modal #modal-match-stats .tm-mark {
+        color: inherit !important;
+    }
+
+    /* Explicit Penalty Colors for Print */
+    body.print-stats-modal #modal-match-stats .card-yellow {
+        color: #f1c40f !important;
+        font-weight: bold;
+        margin-right: 4px;
+    }
+
+    body.print-stats-modal #modal-match-stats .card-red {
+        color: #e74c3c !important;
+        font-weight: bold;
+        margin-right: 4px;
+    }
+
+    body.print-stats-modal #modal-match-stats .card-blue {
+        color: #3498db !important;
+        font-weight: bold;
+        margin-right: 4px;
+    }
+
+    body.print-stats-modal #modal-match-stats .penalty-2min {
+        margin-right: 4px;
+    }
+
+    /* Re-enable semantic text colors but assume white background */
+    body.print-stats-modal #modal-match-stats .text-success {
+        color: #27ae60 !important;
+    }
+
+    body.print-stats-modal #modal-match-stats .text-danger {
+        color: #c0392b !important;
+    }
+
+    /* Specific overrides for layout elements */
+    body.print-stats-modal #modal-match-stats h1,
+    body.print-stats-modal #modal-match-stats h2,
+    body.print-stats-modal #modal-match-stats h3,
+    body.print-stats-modal #modal-match-stats div,
+    body.print-stats-modal #modal-match-stats p,
+    body.print-stats-modal #modal-match-stats td,
+    body.print-stats-modal #modal-match-stats th {
+        color: black !important;
+    }
+
+    /* Exclude specific spans from forced black */
+    body.print-stats-modal #modal-match-stats span:not(.badge):not(.shot-marker):not(.tm-mark):not(.penalty-card) {
+        color: black !important;
+    }
+
+    /* EXCEPTION: Header info text which has dark background */
+    body.print-stats-modal #modal-match-stats #match-stats-header-info,
+    body.print-stats-modal #modal-match-stats #match-stats-header-info div,
+    body.print-stats-modal #modal-match-stats #match-stats-header-info span {
+        color: white !important;
+    }
+
+    body.print-stats-modal .data-table th,
+    body.print-stats-modal .data-table td {
+        border: 1px solid #000 !important;
+        color: black !important;
+    }
+
+    /* Reduce width of Stats Columns (3rd and 4th) - Increased Again (+50%) */
+    body.print-stats-modal .data-table th:nth-child(3),
+    body.print-stats-modal .data-table td:nth-child(3),
+    body.print-stats-modal .data-table th:nth-child(4),
+    body.print-stats-modal .data-table td:nth-child(4) {
+        width: 170px !important;
+        /* Slightly more for new text */
+        max-width: 170px !important;
+        text-align: center !important;
+    }
+
+    /* Adjust Tresty (Col 2) */
+    body.print-stats-modal .data-table th:nth-child(2),
+    body.print-stats-modal .data-table td:nth-child(2) {
+        width: 120px !important;
+        /* Balanced */
+        max-width: 120px !important;
+        text-align: center !important;
+    }
+
+    /* Adjust Player (Col 1) - Let it fill */
+    body.print-stats-modal .data-table th:nth-child(1),
+    body.print-stats-modal .data-table td:nth-child(1) {
+        width: auto !important;
+    }
+
+    /* --- MODE 2: MATCH LOG PRINT (Default) --- */
+    /* Active when NOT printing stats modal */
+
+    body:not(.print-stats-modal) #app {
+        display: block !important;
+    }
+
+    body:not(.print-stats-modal) .view {
+        display: none !important;
+    }
+
+    /* Force Dashboard View Visible */
+    body:not(.print-stats-modal) #view-dashboard {
+        display: block !important;
+        position: relative;
+    }
+
+    /* Force "Čas" Column Visibility */
+    body:not(.print-stats-modal) #events-table th:nth-child(1),
+    body:not(.print-stats-modal) #events-table td:nth-child(1) {
+        display: table-cell !important;
+        width: auto !important;
+    }
+
+    /* Hide Dashboard Graphs & Header Widgets */
+    body:not(.print-stats-modal) .stats-col-right,
+    body:not(.print-stats-modal) .dashboard-header {
+        display: none !important;
+    }
+
+    /* Expand Left Column (Log Table) */
+    body:not(.print-stats-modal) .stats-col-left {
+        width: 100% !important;
+        display: block !important;
+    }
+
+    body:not(.print-stats-modal) .card {
+        background: transparent !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        border: none !important;
+    }
+
+    body:not(.print-stats-modal) #match-log-header {
+        display: block !important;
+        text-align: center;
+        color: black !important;
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #000;
+    }
+
+    /* Table Styling for Log */
+    body:not(.print-stats-modal) .data-table {
+        width: 100% !important;
+        border-collapse: collapse;
+        background: white !important;
+    }
+
+    body:not(.print-stats-modal) .data-table th {
+        background-color: #eee !important;
+        color: black !important;
+        font-weight: bold;
+        border: 1px solid #000;
+    }
+
+    body:not(.print-stats-modal) .data-table td {
+        color: black !important;
+        border: 1px solid #ccc;
+    }
+
+    /* Row Colors converted to Bold for Print */
+    body:not(.print-stats-modal) .row-home {
+        color: #000 !important;
+        font-weight: bold;
+    }
+
+    body:not(.print-stats-modal) .row-guest {
+        color: #000 !important;
+        font-weight: bold;
+        text-decoration: underline;
+        /* Distinguish guest if color absent */
+    }
+
+    /* Show Print Header */
+    .print-header {
+        display: block !important;
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: black;
+        border-bottom: 1px solid #000;
+        padding-bottom: 10px;
+    }
+}
+
+.modal.show,
+.modal.open {
+    display: flex;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-content {
+    background: #2c3e50;
+    padding: 30px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    position: relative;
+    transform: translateY(20px);
+    transition: transform 0.3s;
+    text-align: center;
+}
+
+/* Light Theme Override REMOVED (User Request: Revert to Dark) */
+/*
+#modal-match-stats .modal-content {
+    background: white;
+    color: black;
+}
+
+#modal-match-stats h3,
+#modal-match-stats h4,
+#modal-match-stats p,
+#modal-match-stats span,
+#modal-match-stats div,
+#modal-match-stats td,
+#modal-match-stats th {
+    color: black;
+}
+*/
+
+/* Global Penalty Colors (Ensure visible on Screen & Print) */
+.card-yellow {
+    color: #f1c40f;
+    font-weight: bold;
+    margin-right: 4px;
+}
+
+.card-red {
+    color: #e74c3c;
+    font-weight: bold;
+    margin-right: 4px;
+}
+
+.card-blue {
+    color: #3498db;
+    font-weight: bold;
+    margin-right: 4px;
+}
+
+/* Maintain White Text for Header Info Card */
+#modal-match-stats #match-stats-header-info,
+#modal-match-stats #match-stats-header-info * {
+    color: white !important;
+}
+
+/* Ensure table borders are subtle on dark */
+#modal-match-stats .data-table th {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: white;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+#modal-match-stats .data-table td {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+/* Restore Close Button Visibility on White */
+#modal-match-stats .close-modal {
+    color: #aaa;
+}
+
+#modal-match-stats .close-modal:hover {
+    color: #333;
+}
+
+.modal.show .modal-content,
+.modal.open .modal-content {
+    transform: translateY(0);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-header h3 {
+    margin: 0;
+    color: var(--text);
+}
+
+.close-modal {
+    font-size: 2rem;
+    cursor: pointer;
+    color: var(--text-muted);
+}
+
+.close-modal:hover {
+    color: var(--text);
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Ensure input in modal is interactive and styled */
+#time-edit-input {
+    pointer-events: auto !important;
+    background: rgba(0, 0, 0, 0.4);
+    color: white;
+    border: 2px solid var(--primary);
+    font-family: monospace;
+}
+
+.player-btn.gk-slot-guest {
+    background-color: rgba(214, 90, 49, 0.2);
+    /* Transparent Red */
+    border: 1px solid var(--primary);
+}
+
+.player-btn.gk-slot-guest {
+    background-color: rgba(214, 90, 49, 0.2);
+    /* Transparent Red */
+    border: 1px solid var(--miss);
+}
+
+/* Active Selection Colors */
+.player-btn.team-home.active,
+.player-btn.gk-slot-home.active {
+    background-color: var(--primary) !important;
+    color: #232931 !important;
+    /* Dark text on bright green */
+    border-color: var(--primary) !important;
+}
+
+/* Match Stats Buttons */
+.btn-match-stats-home {
+    background: transparent !important;
+    border: 2px solid var(--primary) !important;
+    /* Green */
+    color: white !important;
+    margin-bottom: 5px;
+}
+
+.btn-match-stats-guest {
+    background: transparent !important;
+    border: 2px solid var(--miss) !important;
+    /* Red */
+    color: white !important;
+    margin-bottom: 5px;
+}
+
+.player-btn.team-guest.active,
+.player-btn.gk-slot-guest.active {
+    background-color: var(--miss) !important;
+    color: white !important;
+    border-color: var(--miss) !important;
+}
+
+/* Hover Effects - Immediate Coloring */
+/* Hover Effects - Immediate Coloring */
+.player-btn {
+    transition: none !important;
+    display: flex !important;
+    /* Force display just in case */
+    opacity: 1 !important;
+    /* Ensure opacity */
+    min-height: 60px !important;
+    /* Ensure height */
+}
+
+.player-btn.team-home:hover:not(.active),
+.player-btn.gk-slot-home:hover:not(.active) {
+    background-color: rgba(78, 204, 163, 0.5) !important;
+    /* Visible Green Tint */
+    border-color: var(--primary);
+    cursor: pointer;
+}
+
+.player-btn.team-guest:hover:not(.active),
+.player-btn.gk-slot-guest:hover:not(.active) {
+    background-color: rgba(214, 90, 49, 0.5) !important;
+    /* Visible Red Tint */
+    border-color: var(--miss);
+    cursor: pointer;
+}
+
+.gk-watermark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.08);
+    /* Very subtle */
+    pointer-events: none;
+    /* Ignore clicks */
+    z-index: 0;
+}
+
+.player-btn.gk-slot .player-label,
+.player-btn.gk-slot .gk-placeholder-content {
+    z-index: 1;
+    /* Ensure text is above watermark */
+    position: relative;
+    width: 100%;
+    /* Ensure clickability */
+}
+
+/* Ensure placeholder content in GK slot spans correctly */
+.gk-placeholder-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.brand-text.overlay-title {
+    font-size: inherit;
+    /* Inherit from H1 */
+    display: inline-block;
+    /* Ensure gradient works */
+}
+
+/* Utility Button Classes */
+.btn-success {
+    background-color: var(--goal);
+    color: #232931;
+    /* Dark text for contrast on bright green */
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+}
+
+.btn-success:hover {
+    background-color: #3cb38e;
+    /* Darker green */
+}
+
+.btn-danger {
+    background-color: var(--miss);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+}
+
+.btn-danger:hover {
+    background-color: #bf4e2a;
+    /* Darker red */
+}
+
+/* Sector Flash Animation */
+.sector-flash {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    background: radial-gradient(circle, rgba(0, 173, 181, 0.8) 0%, rgba(0, 173, 181, 0) 70%);
+    /* Cyan glow */
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0.5);
+    pointer-events: none;
+    z-index: 50;
+    transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+    opacity: 1;
+}
+
+.sector-flash.active {
+    transform: translate(-50%, -50%) scale(2.5);
+    opacity: 0;
+}
+
+
+.btn-danger:hover {
+    background-color: #bf4e2a;
+    /* Darker red */
+}
+
+/* Actions Panel Specifics */
+/* Actions Panel Specifics */
+.actions-panel h3 {
+    font-size: 14px;
+    font-weight: 300;
+    /* Light 14px */
+    color: var(--text-muted);
+    text-transform: none;
+    letter-spacing: 0.5px;
+    margin-top: 16px;
+    /* Reduced spacing (24->16) */
+    margin-bottom: 10px;
+    padding-left: 5px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 10px;
+    /* Matched to margin-bottom */
+    line-height: 1.4;
+    /* Removed truncation to show full text */
+}
+
+.actions-panel h3:first-of-type {
+    margin-top: 4px;
+    /* Shift top section down by 4px */
+}
+
+.btn-action {
+    font-weight: 400;
+    /* Normal weight */
+}
+
+.actions-panel .btn-action {
+    padding: 15px 10px;
+    /* Reduced height by 25% (20->15) */
+    white-space: normal;
+    line-height: 1.2;
+}
+
+/* Stats View Grid Layout */
+.stats-grid-layout {
+    display: grid;
+    grid-template-columns: 4fr 1fr;
+    gap: 20px;
+    align-items: start;
+}
+
+/* Ensure buttons are centered nicely */
+.export-actions {
+    justify-content: center !important;
+}
+
+@media (max-width: 900px) {
+    .stats-grid-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Timeline Visualization */
+.timeline-section h3 {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    /* text-transform: uppercase; REMOVED */
+    margin-bottom: 10px;
+    padding-left: 5px;
+}
+
+.timeline-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 0;
+    /* Hide scrollbar space */
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    padding: 10px;
+    /* Hide Scrollbar */
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE 10+ */
+}
+
+.timeline-wrapper::-webkit-scrollbar {
+    display: none;
+    /* Chrome/Safari */
+}
+
+.timeline-track {
+    position: relative;
+    width: 100%;
+    min-width: 600px;
+    /* Ensure minimal width for precision */
+    height: 60px;
+}
+
+/* Axis Line */
+.tm-axis {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-50%);
+}
+
+/* Ticks */
+.tm-tick {
+    position: absolute;
+    top: 50%;
+    width: 1px;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+}
+
+.tick-1m {
+    height: 6px;
+    /* Minute tick */
+}
+
+.tick-5m {
+    height: 12px;
+    background: rgba(255, 255, 255, 0.5);
+    /* 5th min */
+}
+
+.tick-10m {
+    height: 18px;
+    background: rgba(255, 255, 255, 0.7);
+    /* 10th min */
+}
+
+
+.tm-mark {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    background: gray;
+    transform: translateX(-50%);
+    /* Centers on the exact time */
+    z-index: 2;
+}
+
+.tm-mark.green {
+    background: var(--goal);
+}
+
+.tm-mark.red {
+    background: #e74c3c;
+}
+
+/* Minute Label */
+.tm-label {
+    position: absolute;
+    top: 65%;
+    /* Below axis */
+    transform: translateX(-50%);
+    font-size: 10px;
+    color: var(--text-muted);
+}
+
+/* Stats Court Sizing */
+#stats-court-heatmap,
+#team-stats-court {
+    aspect-ratio: 2 / 1;
+    width: 90%;
+    margin: 0 auto;
+    /* Center it */
+    flex: none;
+    /* Disable flex:1 from class */
+    height: auto;
+}
+
+/* Stats Selectors */
+.stats-selectors-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.timeline-track.compact {
+    height: 40px;
+}
+
+.timeline-track.vertical {
+    height: 100%;
+    min-height: 500px;
+    width: 100%;
+    min-width: unset;
+}
+
+.card-title-style {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 10px;
+    width: 100%;
+}
+
+.selector-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.selector-col h3 {
+    margin: 0;
+    font-size: 1.1em;
+    font-weight: 500;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+}
+
+.btn-stat-select {
+    width: 100%;
+    max-width: 200px;
+    padding: 12px 35px 12px 12px;
+    /* Space for icon */
+    background-color: rgba(255, 255, 255, 0.05);
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='rgba(255, 255, 255, 0.7)'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 0.95em;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    text-align-last: center;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+/* Specific fix for Button elements (Team) - No Arrow */
+button.btn-stat-select {
+    background-image: none;
+    padding: 12px;
+}
+
+.btn-stat-select:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+/* Home Styling */
+
+
+.selector-col.home .btn-stat-select:hover {
+    border-color: #2ecc71;
+    background: rgba(46, 204, 113, 0.1);
+}
+
+/* Guest Styling */
+
+
+.selector-col.guest .btn-stat-select:hover {
+    border-color: #e74c3c;
+    background: rgba(231, 76, 60, 0.1);
+}
+
+/* Flash Animations */
+@keyframes flashGreen {
+    0% {
+        border-color: #2ecc71;
+        background-color: rgba(46, 204, 113, 0.3);
+        box-shadow: 0 0 15px rgba(46, 204, 113, 0.5);
+    }
+
+    100% {
+        border-color: rgba(255, 255, 255, 0.1);
+        background-color: rgba(255, 255, 255, 0.05);
+        box-shadow: none;
+    }
+}
+
+@keyframes flashRed {
+    0% {
+        border-color: #e74c3c;
+        background-color: rgba(231, 76, 60, 0.3);
+        box-shadow: 0 0 15px rgba(231, 76, 60, 0.5);
+    }
+
+    100% {
+        border-color: rgba(255, 255, 255, 0.1);
+        background-color: rgba(255, 255, 255, 0.05);
+        box-shadow: none;
+    }
+}
+
+.flash-home {
+    animation: flashGreen 0.5s ease-out;
+}
+
+.flash-guest {
+    animation: flashRed 0.5s ease-out;
+}
+
+#team-stats-markers {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* Option styling for dark mode */
+.btn-stat-select option {
+    background: #2c3e50;
+    color: white;
+}
+
+/* GOAL GRID SELECTOR */
+/* Goal Grid Input (Refined to look like Goal) */
+.goal-grid-selector {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 2px;
+    /* Small gap (or frame thickness) */
+    width: 300px;
+    height: 200px;
+    /* Goal Aspect */
+    margin: 20px auto;
+    background: #c0392b;
+    /* Frame Color (Red) shown in gaps */
+    border: 5px solid #c0392b;
+    /* Outer Frame */
+    /* border-bottom: none; Optional if floor */
+    position: relative;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+.goal-grid-selector button {
+    background: rgba(44, 62, 80, 0.9);
+    /* Dark background inside cells */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    /* Subtle grid lines */
+    color: white;
+    font-size: 1.5rem;
+    font-weight: bold;
+    border-radius: 0;
+    /* Square zones */
+    cursor: pointer;
+    transition: all 0.2s;
+    height: 100%;
+}
+
+.goal-grid-selector button:hover {
+    background: rgba(78, 204, 163, 0.6);
+    /* Highlight Green */
+    border-color: #4ecca3;
+}
+
+/* Visualization markers (Numbered) */
+.shot-marker,
+.goal-marker {
+    position: absolute;
+    width: 24px;
+    /* Larger for number */
+    height: 24px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+
+    /* Flex for Number Centering */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-weight: bold;
+    font-size: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.shot-connection-line {
+    stroke: #4ecca3;
+    stroke-width: 2;
+    opacity: 0.6;
+}
+
+/* Specific styling for goal marker if distinguishing needed */
+.goal-marker {
+    z-index: 50;
+    /* Ensure on top of goal structure (z-index ~20?) */
+    /* Top of shots? */
+    border: 1px solid white;
+    width: 17px;
+    height: 17px;
+    font-size: 9px;
+}
+
+/* Extra visibility */
+/* Extra visibility removed */
+
+
+
+/* Connection Line */
+.shot-connection-line {
+    stroke-width: 2;
+    stroke-linecap: round;
+    opacity: 0.8;
+}
+
+.shot-connection-line.goal {
+    stroke: var(--goal);
+}
+
+.shot-connection-line.miss {
+    stroke: var(--miss);
+    /* Usually not used if missed goal but... */
+}
+
+/* Sector Labels on Court Map */
+.sector-label {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    color: rgba(52, 152, 219, 0.3);
+    /* Blue with 30% Opacity */
+    font-size: 2rem;
+    font-weight: 900;
+    pointer-events: none;
+    /* Allow clicking through if needed */
+    z-index: 1;
+    /* Below markers */
+    text-shadow: none;
+    font-family: 'Roboto', sans-serif;
+    /* Ensure bold sans */
+}
+
+/* 7m Button */
+.btn-7m {
+    position: absolute;
+    top: 60%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: white;
+    color: #2151A8;
+    border: 2px solid #2151A8;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    z-index: 20;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    padding: 0;
+}
+
+.btn-7m:hover {
+    transform: translate(-50%, -50%) scale(1.1);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.4);
+}
+
+/* Text Colors */
+.text-success {
+    color: #2ecc71 !important;
+    font-weight: bold;
+}
+
+.text-danger {
+    color: #e74c3c !important;
+    font-weight: bold;
+}
+
+/* Print Styles */
+/* Print Only Header */
+.print-header {
+    display: none;
+}
+
+@media print {
+    @page {
+        margin: 1cm;
+        size: auto;
+    }
+
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    /* Hide Navigation and Controls */
+    .top-nav,
+    .dashboard-controls,
+    .export-actions,
+    .btn-danger,
+    .btn-secondary,
+    .btn-primary,
+    .view:not(.active),
+    #startup-overlay,
+    .modal,
+    .half-toggles,
+    .header-stat,
+    .stats-col-right
+
+    /* Hide Graphics Column */
+        {
+        display: none !important;
+    }
+
+    /* Specific overrides */
+    .view,
+    #view-dashboard,
+    #view-team-stats {
+        display: block !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* Dashboard Table Layout */
+    .stats-grid-layout {
+        display: block !important;
+    }
+
+    .stats-col-left {
+        width: 100% !important;
+    }
+
+    /* Print Header - Small & Right Aligned */
+    .print-header {
+        display: block !important;
+        text-align: right;
+        font-size: 0.9rem;
+        /* Small */
+        font-weight: normal;
+        margin-bottom: 20px;
+        width: 100%;
+        color: black;
+    }
+
+    /* Court Image Constraint - Centered Fixed Width + Scale */
+    .court-container {
+        /* Logical Size: 1000px */
+        width: 1000px !important;
+        max-width: none !important;
+
+        /* Scale 0.725 -> Visual Width ~725px. Fits A4 width (aligns with Timeline) */
+        transform: scale(0.725) !important;
+        transform-origin: top center !important;
+
+        /* Center element on page */
+        margin: 0 auto !important;
+        padding: 0 !important;
+
+        height: auto !important;
+        aspect-ratio: 1.5 / 1 !important;
+        /* 1000/1.5 = 666px logical height */
+
+        left: 0 !important;
+        right: 0 !important;
+        box-shadow: none !important;
+        background-color: #2151A8 !important;
+        color: white !important;
+        overflow: visible !important;
+        /* Revert to visible */
+    }
+
+    /* Ensure parents don't clip the centered map */
+    .view,
+    #view-team-stats,
+    .card,
+    .card-body {
+        overflow: visible !important;
+    }
+
+    #view-team-stats .court-container {
+        /* height ~483px (666*0.725). logical 666. diff -183px */
+        margin-bottom: -185px !important;
+    }
+
+    /* Force inner text (Goal Numbers) to be white */
+    .court-container .goal-grid-numbers div {
+        color: white !important;
+        border-color: white !important;
+        text-shadow: 0 0 2px black;
+    }
+
+    /* Restoration of Watermark: Ensure Sector Labels are NOT fully white opaque */
+    .court-container .sector-label {
+        color: rgba(255, 255, 255, 0.2) !important;
+        text-shadow: none !important;
+    }
+
+    /* Timeline Background */
+    .timeline-wrapper {
+        background-color: #232931 !important;
+        color: white !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        /* Standard property */
+        border: 1px solid #444;
+    }
+
+    /* Table Colors: Dark BG + White Text */
+    .data-table {
+        width: 100% !important;
+        background-color: #232931 !important;
+        color: white !important;
+    }
+
+    .data-table th,
+    .data-table td {
+        color: white !important;
+        border-color: #444 !important;
+    }
+
+    .data-table .text-success {
+        color: #2ecc71 !important;
+    }
+
+    .data-table .text-danger {
+        color: #e74c3c !important;
+    }
+
+    /* Hide Duplicate Title (Dashboard Header) */
+    .dashboard-header h1 {
+        display: none !important;
+    }
+
+    /* Page Background White, Content Text Black (unless overridden) */
+    body {
+        background-color: white !important;
+        color: black !important;
+    }
+
+    /* Allow backgrounds for Cards (Legend/Timeline) */
+    .card {
+        border: none !important;
+        box-shadow: none;
+        background-color: transparent !important;
+    }
+
+    /* Stats Selectors (Legend Cards) need BG? */
+    .stats-selectors-grid .card {
+        background-color: #232931 !important;
+        color: white !important;
+    }
+}
+
+/* Defense Buttons (New Square Layout) */
+.defense-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    /* Horizontal Gap */
+    row-gap: 64px;
+    /* Vertical Gap between pairs (Mezery mezi dvojicemi) */
+    align-self: center;
+    /* Vertically Center in the Sidebar */
+    margin-bottom: 0;
+}
+
+.defense-btn {
+    height: 85px;
+    /* Double the height of standard 42px buttons + border logic */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.def-label {
+    font-size: 0.9rem;
+    /* Unify Size */
+    font-weight: 400;
+    /* Unify Weight */
+    text-transform: none;
+    /* Sentence case/As written */
+    margin-bottom: -5px;
+    opacity: 0.9;
+}
+
+.def-symbol {
+    font-size: 3rem;
+    /* Very Large */
+    font-weight: 900;
+    line-height: 1;
+}
+
+.defense-btn.success {
+    background: var(--goal);
+    color: #232931;
+    border: none;
+}
+
+.defense-btn.success:hover {
+    background: #3cb38e;
+}
+
+.defense-btn.fail {
+    /* Match the 2min/Red styling */
+    background: rgba(255, 107, 107, 0.25);
+    color: #fff;
+    border: 1px solid rgba(255, 107, 107, 0.3);
+}
+
+.defense-btn.fail:hover {
+    background: rgba(255, 107, 107, 0.4);
+}
+
+/* Attack Type Buttons */
+.attack-type {
+    background: #7f8c8d;
+    /* Gray */
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 1rem;
+    line-height: 1.2;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.attack-type:hover {
+    background: #95a5a6;
+    transform: translateY(-2px);
+}
+
+.attack-postupny {
+    color: var(--goal);
+    /* Green Text */
+}
+
+.attack-rychly {
+    color: var(--miss);
+    /* Red Text */
+}
+
+.btn-dark-gray {
+    background: #2c3e50 !important;
+    /* Dark Gray */
+    color: white !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    /* With Border */
+    font-size: 0.9rem !important;
+    /* Matches small-grid buttons like Přešlap */
+    font-weight: 400 !important;
+    /* Matches Přešlap (Normal weight) */
+    text-align: center;
+    /* Ensure centering */
+    line-height: 1.2;
+    /* Matches Přešlap (Normal weight) */
+    text-align: center;
+    /* Ensure centering */
+    line-height: 1.2;
+    /* Tight spacing for stacked text */
+    text-transform: none;
+    /* Ensure no uppercase */
+    font-family: inherit;
+    /* Unify font */
+}
+
+/* Fast Attack Specific Style */
+.btn-fast-attack {
+    border: 2px solid #2ecc71 !important;
+    /* Green Border */
+    color: #d5f5e3 !important;
+    /* Light Green Text (almost white but green tint) */
+}
+
+.btn-dark-gray:hover {
+    background: #34495e !important;
+    border-color: white !important;
+}
+
+/* Penalty Modal Grid */
+.penalty-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    padding: 10px;
+}
+
+/* Unify Modal Buttons too? User said "U všech tlačítek". */
+.btn-penalty {
+    padding: 20px;
+    font-size: 1.1rem;
+    /* Modals can be larger? Or unify? Keeping generic size for now unless sidebar specific. */
+    /* Wait, user said "Tlačítka v hlavním pravém sidebaru vycentruj... U všech tlačítek sjednotit font..." */
+    /* I'll adjust weight to 400 and remove uppercase here too. */
+    font-weight: 400;
+    /* Unify Weight */
+    color: #232931;
+    border: none;
+    border-radius: 8px;
+    /* Rounded corners (half of 15px ~ 8px) */
+    cursor: pointer;
+    text-transform: none;
+    /* Sentence case */
+    transition: transform 0.1s;
+    font-family: inherit;
+}
+
+.btn-penalty:active {
+    transform: scale(0.98);
+}
+
+.btn-penalty.yellow {
+    background: #f1c40f;
+    color: #232931;
+}
+
+/* Update Animation for Counters */
+@keyframes pulseUpdate {
+    0% {
+        transform: scale(1);
+        filter: brightness(1);
+    }
+
+    50% {
+        transform: scale(1.3);
+        filter: brightness(1.5);
+        color: #fff;
+    }
+
+    100% {
+        transform: scale(1);
+        filter: brightness(1);
+    }
+}
+
+.pulse-update {
+    animation: pulseUpdate 0.4s ease-out;
+}
+
+.btn-penalty.two-min {
+    /* Match Obrana - (Fail) Color */
+    background: rgba(255, 107, 107, 0.25);
+    color: #fff;
+    border: 1px solid rgba(255, 107, 107, 0.3);
+}
+
+.btn-penalty.red {
+    background: #c0392b;
+    color: #fff;
+}
+
+.btn-penalty.blue {
+    background: #3498db;
+    color: #fff;
+}
+
+/* Active Tresty Button State */
+/* Tresty Custom Base */
+.btn-tresty-base {
+    background: #e74c3c !important;
+    /* Red Base */
+    color: white !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    font-size: 1.1rem !important;
+    /* Increased font size as requested */
+    font-weight: 400 !important;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.btn-tresty-base:hover {
+    background: #c0392b !important;
+}
+
+/* Active Tresty Button State (Flash) */
+.btn-action.active-tresty {
+    animation: flash-red 0.5s ease-in-out;
+}
+
+/* Tech Faults Button Style (Matching Obrana -) */
+/* Tech Faults Button Style (Matching Obrana -) */
+.btn-tech-base {
+    background: rgba(255, 107, 107, 0.25) !important;
+    color: #fff !important;
+    border: 1px solid rgba(255, 107, 107, 0.3) !important;
+    font-size: 0.9rem !important;
+    /* Unify Size for Sidebar */
+    font-weight: 400 !important;
+    /* Unify Weight */
+    text-align: center;
+    line-height: 1.2;
+    text-transform: none;
+    /* Sentence case */
+}
+
+.btn-tech-base:hover {
+    background: rgba(255, 107, 107, 0.4) !important;
+}
+
+@keyframes flash-red {
+    0% {
+        background: #e74c3c !important;
+    }
+
+    50% {
+        background: #922b21 !important;
+    }
+
+    /* Dark Red */
+    100% {
+        background: #e74c3c !important;
+    }
+}
+
+@keyframes flash-red-bg {
+
+    0%,
+    100% {
+        background-color: #e74c3c !important;
+    }
+
+    50% {
+        background-color: #5c1812 !important;
+    }
+
+    /* Very Dark Red */
+}
+
+@keyframes pulse-red {
+    0% {
+        box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4);
+    }
+
+    70% {
+        box-shadow: 0 0 0 10px rgba(231, 76, 60, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(231, 76, 60, 0);
+    }
+}
+
+/* Notifications (Added for Enlargement) */
+.notification {
+    background: #333;
+    color: white;
+    padding: 15px 25px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    min-width: 300px;
+    text-align: center;
+    font-size: 1.2rem;
+    animation: fadeIn 0.3s ease-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.notification.warning {
+    background: #e67e22;
+    /* Orange */
+    color: white;
+    font-weight: bold;
+    font-size: 1.5rem;
+    /* Large warning */
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.notification.error {
+    background: #e74c3c;
+    font-size: 1.3rem;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Penalty Visuals - Letters */
+.penalty-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 100%;
+}
+
+.penalty-letter {
+    font-weight: 900;
+    font-size: 1.2rem;
+    line-height: 1;
+    display: inline-block;
+}
+
+.letter-yellow {
+    color: #f1c40f !important;
+    text-shadow: 0 0 1px #000;
+}
+
+.letter-red {
+    color: #e74c3c !important;
+    text-shadow: 0 0 1px #000;
+}
+
+.letter-blue {
+    color: #3498db !important;
+    text-shadow: 0 0 1px #000;
+}
+
+.penalty-2min {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: var(--text-muted);
+    margin-left: 2px;
+}
+
+.disabled-feature {
+    background-color: #95a5a6 !important;
+    cursor: not-allowed !important;
+    opacity: 0.6;
+}
+
+/* NOTIFICATION CONTAINER Z-INDEX FIX (Appended) */
+#notification-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2147483647 !important;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+    align-items: center;
+    /* Center toast text */
+}
+
+.notification-toast {
+    pointer-events: auto;
+}
+
+/* AUTOMATED FIX: Notification Visibility */
+.notification-toast {
+    position: relative !important;
+    transform: none !important;
+    opacity: 1 !important;
+    display: flex !important;
+    background: #e74c3c;
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    pointer-events: auto;
+    animation: slideIn 0.3s forwards;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}
+
+.notification-toast.success {
+    background: #4ecca3 !important;
+    /* Unified Green */
+    color: #232931 !important;
+    /* Dark text for contrast */
+}
+
+/* DARK THEME UPGRADE MODAL (User Request) */
+.modal-upgrade-wide {
+    background: var(--card-bg) !important;
+    color: var(--text) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-upgrade-wide h2,
+.modal-upgrade-wide h3,
+.modal-upgrade-wide p {
+    color: var(--text) !important;
+}
+
+/* Dark Pricing Cards */
+.pricing-card {
+    background: var(--bg) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2) !important;
+}
+
+.pricing-card h3 {
+    color: var(--text-muted) !important;
+}
+
+.pricing-card.pro {
+    border: 2px solid var(--primary) !important;
+    background: var(--bg) !important;
+    /* Ensure Dark Background */
+    /* Remove white tint, maybe add subtle glow */
+    box-shadow: 0 0 15px rgba(78, 204, 163, 0.1) !important;
+}
+
+.pricing-card.pro h3 {
+    color: var(--primary) !important;
+}
+
+/* Typography Colors */
+.pricing-price {
+    color: var(--text) !important;
+}
+
+.pricing-period {
+    color: var(--text-muted) !important;
+}
+
+.pricing-features li {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+    color: var(--text-muted) !important;
+}
+
+/* Unified Green Checkmarks */
+.pricing-features li span:first-child {
+    color: var(--primary) !important;
+    /* Unified Green */
+}
+
+/* Centered Unified Button */
+.btn-success.large {
+    background-color: var(--primary) !important;
+    color: #232931 !important;
+    /* Dark text for contrast on bright green */
+    font-weight: bold;
+    border: none !important;
+    margin: 20px auto !important;
+    /* Center Horizontally */
+    display: block !important;
+    box-shadow: 0 4px 15px rgba(78, 204, 163, 0.3) !important;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-success.large:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(78, 204, 163, 0.4) !important;
+}
+
+/* RESTORED STUCTURAL LAYOUT (Fix "Broken Columns") */
+.modal-upgrade-wide {
+    width: 90vw !important;
+    max-width: 900px !important;
+    padding: 40px !important;
+    /* No background here, handled by Dark Theme block */
+}
+
+.pricing-container {
+    display: flex !important;
+    gap: 30px !important;
+    justify-content: center !important;
+    margin: 40px 0 !important;
+    align-items: stretch !important;
+}
+
+.pricing-card {
+    flex: 1 !important;
+    border-radius: 16px !important;
+    padding: 30px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    text-align: center !important;
+    /* Background handled by Dark Theme block */
+}
+
+.pricing-price {
+    font-size: 2.5rem !important;
+    font-weight: 800 !important;
+    margin: 15px 0 !important;
+}
+
+.pricing-features {
+    text-align: left !important;
+    margin-top: 20px !important;
+    flex-grow: 1 !important;
+}
+
+.pricing-features li {
+    padding: 10px 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+}
+
+/* USER REQUEST: Refined Typography & Alignment */
+.pricing-card.pro h3 {
+    font-size: 3rem !important;
+    /* Reduced from 4rem */
+    margin-bottom: 0 !important;
+    line-height: 1.2;
+    min-height: 60px;
+    /* Align columns */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pricing-card h3 {
+    font-size: 2rem !important;
+    font-weight: 400 !important;
+    /* Normal weight for FREE */
+    min-height: 60px;
+    /* Align columns */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pricing-price {
+    min-height: 50px;
+    /* Align price rows */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* AUTOMATED FIX: Statistics Modal Scrolling */
+#modal-match-stats .modal-content {
+    max-height: 85vh !important;
+    overflow-y: auto !important;
+    /* Ensure block layout for scrolling */
+    padding-bottom: 200px !important;
+    /* Massive padding for bottom buttons (increased) */
+}
+
+/* ADMIN MODAL WIDE */
+#modal-admin .modal-content {
+    max-width: 1000px !important;
+    width: 95% !important;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+/* --- HOTFIX: Layout Visibility & Sub-Out Logic --- */
+
+/* Force Match Grid Height and Columns */
+.match-grid {
+    display: grid !important;
+    grid-template-columns: minmax(300px, 1fr) 2fr minmax(200px, 250px) !important;
+    gap: 20px;
+    height: calc(100vh - 220px) !important;
+    min-height: 600px;
+    overflow: hidden;
+}
+
+/* Force Court Container Visibility */
+.court-container {
+    height: 100% !important;
+    width: 100% !important;
+    flex: 1 1 auto !important;
+    margin-bottom: 0 !important;
+    min-height: 0 !important;
+    /* Allow shrink inside flex */
+}
+
+/* Ensure Panel fits grid */
+.panel.court-panel {
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    /* Remove padding to let court fill */
+}
+
+/* Responsive Override */
+@media (max-width: 1024px) {
+    .match-grid {
+        display: flex !important;
+        flex-direction: column !important;
+        height: auto !important;
+    }
+
+    .court-container {
+        height: auto !important;
+        aspect-ratio: 1.4/1;
+    }
+
+    .panel.court-panel {
+        height: auto !important;
+        min-height: 400px;
+    }
+}
+
+/* Fix Active State Visibility for Sub-Out Button */
+.btn-sub-out.active {
+    background-color: #e74c3c !important;
+    color: white !important;
+    border-color: #e74c3c !important;
+    box-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
+}
+
+
+/* --- HOTFIX 2: Active Player Selection Color --- */
+/* Ensure active state overrides on-court black background */
+.player-btn.on-court.active,
+.player-btn.active {
+    background: #2ecc71 !important;
+    background-color: #2ecc71 !important;
+    color: white !important;
+    border-color: #2ecc71 !important;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+/* --- USER REQUEST: BIGGER TEAM BUTTONS --- */
+.team-toggle {
+    display: flex !important;
+    /* Ensure flex layout */
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.team-toggle button {
+    flex: 1;
+    /* Buttons share width equally */
+    padding: 15px 0 !important;
+    /* Significantly taller */
+    font-size: 1.3rem !important;
+    /* Larger text */
+    font-weight: 800 !important;
+    /* Bold */
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    /* Ensure border radius implies clickable */
+    border-radius: 8px !important;
+    transition: all 0.2s ease;
+}
+
+/* Ensure active state pops even more */
+.team-toggle button.active {
+    transform: scale(1.02);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    z-index: 1;
+}
+
+/* --- USER REQUEST: SMALLER & COLORED TEAM BUTTONS --- */
+.team-toggle {
+    margin-bottom: 10px !important;
+    /* Reduced spacing */
+    gap: 8px !important;
+}
+
+.team-toggle button {
+    padding: 8px 0 !important;
+    /* ~50% of 15px */
+    font-size: 1rem !important;
+    /* ~Normal size */
+    font-weight: 700 !important;
+    border: 2px solid transparent !important;
+    /* Prep for border state */
+}
+
+/* Home Button - GREEN */
+#btn-team-home {
+    background-color: rgba(46, 204, 113, 0.2) !important;
+    /* Dimmed Base */
+    color: #2ecc71 !important;
+    border-color: #2ecc71 !important;
+}
+
+#btn-team-home.active {
+    background-color: #2ecc71 !important;
+    /* Solid Green */
+    color: white !important;
+    box-shadow: 0 0 10px rgba(46, 204, 113, 0.5) !important;
+}
+
+/* Guest Button - RED */
+#btn-team-guest {
+    background-color: rgba(231, 76, 60, 0.2) !important;
+    /* Dimmed Base */
+    color: #e74c3c !important;
+    border-color: #e74c3c !important;
+}
+
+#btn-team-guest.active {
+    background-color: #e74c3c !important;
+    /* Solid Red */
+    color: white !important;
+    box-shadow: 0 0 10px rgba(231, 76, 60, 0.5) !important;
+}
+
+/* --- USER REQUEST: UNIFIED CONTROLS ROW --- */
+.controls-row-unified {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+    width: 100%;
+}
+
+.team-toggle-container {
+    flex: 1;
+    /* Takes 50% of width (roughly) */
+    display: flex;
+    gap: 4px;
+}
+
+.team-toggle-container button {
+    flex: 1;
+    /* Split the container width */
+    padding: 6px 0 !important;
+    font-size: 0.8rem !important;
+    /* Smaller as requested */
+    font-weight: 700 !important;
+    border-radius: 4px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* Maintain reduced padding/size from previous request but ensure fit */
+}
+
+/* Force colors from previous step applied to ID selectors, so they persist. */
+
+.btn-sub-out {
+    flex: 1;
+    /* Takes the other 50% */
+    padding: 6px 10px !important;
+    font-size: 0.9rem !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    margin-bottom: 0 !important;
+    /* Reset margin from previous */
+    height: auto !important;
+    /* Match height naturally */
+}
+
+/* --- USER REQUEST: GAP & ALIGNMENT REFINEMENT --- */
+.controls-row-unified {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    /* Match player grid columns */
+    gap: 8px !important;
+    /* Match player grid gap */
+    width: 100%;
+}
+
+.team-toggle-container {
+    /* Fills Left Column naturally */
+    display: flex;
+    gap: 4px;
+    width: 100%;
+}
+
+.btn-sub-out {
+    /* Right Column Handling */
+    justify-self: end !important;
+    /* Align to right edge */
+    width: 50% !important;
+    /* 50% of the column width */
+    flex: none !important;
+    /* Disable flex-grow from previous rule */
+    /* Maintain other styles */
+}
+
+/* --- USER REQUEST: STATISTICS TOGGLE STYLING (Match Home/Guest style) --- */
+
+/* Home Stat Button */
+#stat-toggle-home {
+    background-color: rgba(46, 204, 113, 0.2) !important;
+    color: #2ecc71 !important;
+    border: 2px solid transparent !important;
+    border-color: #2ecc71 !important;
+    padding: 8px 0 !important;
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+    border-radius: 8px !important;
+    flex: 1;
+}
+
+#stat-toggle-home.active {
+    background-color: #2ecc71 !important;
+    color: white !important;
+    box-shadow: 0 0 10px rgba(46, 204, 113, 0.5) !important;
+}
+
+.dashboard-controls .team-toggle {
+    display: flex !important;
+    gap: 8px !important;
+}
+
+/* Guest Stat Button */
+#stat-toggle-guest {
+    background-color: rgba(231, 76, 60, 0.2) !important;
+    color: #e74c3c !important;
+    border: 2px solid transparent !important;
+    border-color: #e74c3c !important;
+    padding: 8px 0 !important;
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+    border-radius: 8px !important;
+    flex: 1;
+}
+
+#stat-toggle-guest.active {
+    background-color: #e74c3c !important;
+    color: white !important;
+    box-shadow: 0 0 10px rgba(231, 76, 60, 0.5) !important;
+}
+
+/* Override Container Width if needed */
+/* User said "same size", match buttons are quite wide. */
+/* Container is 300px inline. */
+/* Buttons will be ~150px each. */
+
+
+/* --- TOP ACTION BAR (CENTERED ABOVE COURT) --- */
+.top-action-bar {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+    /* Allow wrap on very small screens, though ideally 1 row */
+}
+
+/* Action Items Container (Button + Counter) */
+.action-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    /* Distribute space evenly */
+    min-width: 80px;
+    /* Minimum width for buttons */
+    max-width: 130px;
+    /* Prevent them from getting too wide */
+}
+
+/* Counter Label Styling */
+.action-counter {
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 2px;
+}
+
+/* Adjust button height for the top bar to be compact */
+.top-action-bar .btn-action {
+    height: 50px !important;
+    /* Fixed height for consistency */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    line-height: 1.1;
+    padding: 2px !important;
+    font-size: 0.75rem !important;
+    width: 100% !important;
+    margin-bottom: 0 !important;
+}
+
+/* Specific button content adj adjustments */
+.top-action-bar .material-icons-round {
+    font-size: 18px !important;
+    margin-bottom: 2px;
+}
+
+.top-action-bar .def-symbol {
+    font-size: 1.2rem !important;
+    line-height: 1;
+}
+
+/* Adjust Court Panel to allow flow */
+.panel.court-panel {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    /* Prevent clipping at top */
+    overflow-y: auto !important;
+    /* Allow scrolling */
+    padding: 8px !important;
+    /* Add padding back since we have content inside */
+}
+
+/* Ensure Court Container takes remaining height */
+.court-container {
+    flex: 0 0 auto !important;
+    /* Force auto height based on aspect ratio */
+    width: 100%;
+}
+
+/* Fix Logs in Side Panel */
+.panel.side-panel .action-logs {
+    font-size: 0.85rem;
+}
+
+.panel.side-panel .log-item {
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* --- EQUAL SIDE PANELS --- */
+
+/* Ensure generic .panel style works for both or define explicitly */
+.players-panel,
+.side-panel {
+    background: #232931 !important;
+    /* Secondary BG */
+    border-radius: 8px;
+    padding: 10px !important;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    /* Ensure no sizing differences */
+    box-sizing: border-box;
+    border: 1px solid #393e46;
+    /* Subtle border matching theme */
+
+    /* CRITICAL FIX FOR GRID SYMMETRY */
+    min-width: 0 !important;
+    /* Allow shrinking below content size to respect grid track */
+    width: 100% !important;
+    /* Fill grid cell */
+    overflow: hidden !important;
+    /* Contain internal overflow */
+}
+
+.panel.court-panel {
+    min-width: 0 !important;
+    /* Same for center panel */
+}
+
+/* --- TABLET SCOREBOARD FIX (Specificity/Order Fix) --- */
+@media (max-width: 1024px) {
+    .scoreboard-inner {
+        grid-column: 1 !important;
+        /* Force into first column */
+        width: 100% !important;
+        display: grid !important;
+        grid-template-columns: 1fr 1fr 1fr !important;
+        /* Keep horizontal layout */
+        /* Or if user wants vertical stack: */
+        /* display: flex !important; flex-direction: column !important; */
+        /* User said "centered", consistent with 3-col layout if centered. */
+        /* The issue was likely grid-column: 2 pushing it right. */
+    }
+
+    .scoreboard {
+        grid-template-columns: 1fr !important;
+        padding: 10px !important;
+    }
+}
+
+/* Ensure Side Panel Log takes available space */
+.side-panel .action-logs {
+    flex: 1;
+    overflow-y: auto;
+    width: 100%;
+}
+
+/* --- TABLET & TOUCH OPTIMIZATION --- */
+
+/* 1. Smooth Scrolling for iOS */
+.panel.court-panel,
+.side-panel .action-logs,
+.players-panel,
+.modal-content {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+}
+
+/* 2. Better Touch Targets & Interaction */
+button,
+.btn,
+.player-btn,
+.action-btn,
+.btn-stat-select,
+select,
+input {
+    touch-action: manipulation;
+    /* Disable double-tap zoom delay */
+    -webkit-tap-highlight-color: transparent;
+    /* Remove default grey tap box */
+}
+
+/* Prevent text selection on control elements */
+button,
+.btn,
+.player-btn,
+.action-btn,
+.scoreboard {
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* 3. Tactile Feedback (Active State) */
+/* Apply to all interactive buttons */
+button:active,
+.btn:active,
+.player-btn:active,
+.action-btn:active {
+    transform: scale(0.96);
+    opacity: 0.9;
+    transition: transform 0.05s ease;
+}
+
+/* 4. Input Visibility Fix */
+/* Ensure inputs in modals (like Registration) are accessible and text is readable */
+input[type="text"],
+input[type="email"],
+input[type="number"],
+input[type="password"] {
+    -webkit-appearance: none;
+    /* Remove iOS styles */
+    appearance: none;
+    font-size: 16px;
+    /* Prevent auto-zoom on iOS inputs < 16px */
+}
+
+/* 5. Fix Login Overlay Z-Index & interaction */
+#login-overlay {
+    touch-action: auto;
+    /* Allow scrolling/typing */
+    -webkit-overflow-scrolling: touch;
+}
+
+
+/* --- TABLET GOAL SCALING FIX --- */
+@media (max-width: 1024px) {
+
+    /* Specific target for Stats Tab to ensure resize works */
+    #team-stats-court .goal-structure {
+        width: 29.6% !important;
+        /* "21% menší" than 37.5% = 29.6% */
+        height: auto !important;
+        aspect-ratio: 1.5 / 1;
+        top: 6% !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+
+        /* THICKER POSTS FOR TABLET (10px) - "150% širší" */
+        background:
+            /* Left Post (10px) */
+            linear-gradient(to bottom, #e74c3c 0% 20%, #ffffff 20% 40%, #e74c3c 40% 60%, #ffffff 60% 80%, #e74c3c 80% 100%) left top / 10px 100% no-repeat,
+            /* Right Post (10px) */
+            linear-gradient(to bottom, #e74c3c 0% 20%, #ffffff 20% 40%, #e74c3c 40% 60%, #ffffff 60% 80%, #e74c3c 80% 100%) right top / 10px 100% no-repeat,
+            /* Crossbar (10px) */
+            linear-gradient(to right, #e74c3c 0% 14.28%, #ffffff 14.28% 28.56%, #e74c3c 28.56% 42.84%, #ffffff 42.84% 57.12%, #e74c3c 57.12% 71.4%, #ffffff 71.4% 85.68%, #e74c3c 85.68% 100%) center top / 100% 10px no-repeat,
+            /* Grid Vertical */
+            linear-gradient(to right, transparent 33.33%, rgba(255, 255, 255, 0.4) 33.33%, rgba(255, 255, 255, 0.4) calc(33.33% + 1px), transparent calc(33.33% + 1px), transparent 66.66%, rgba(255, 255, 255, 0.4) 66.66%, rgba(255, 255, 255, 0.4) calc(66.66% + 1px), transparent calc(66.66% + 1px)) center bottom / calc(100% - 20px) calc(100% - 10px) no-repeat,
+            /* Grid Horizontal */
+            linear-gradient(to bottom, transparent 33.33%, rgba(255, 255, 255, 0.4) 33.33%, rgba(255, 255, 255, 0.4) calc(33.33% + 1px), transparent calc(33.33% + 1px), transparent 66.66%, rgba(255, 255, 255, 0.4) 66.66%, rgba(255, 255, 255, 0.4) calc(66.66% + 1px), transparent calc(66.66% + 1px)) center bottom / calc(100% - 20px) calc(100% - 10px) no-repeat !important;
+    }
+
+    /* Adjust grid numbers for 10px posts */
+    .goal-grid-numbers {
+        font-size: 1.0rem !important;
+        font-weight: normal !important;
+        left: 12px !important;
+        right: 12px !important;
+        top: 12px !important;
+        bottom: 8px !important;
+    }
+}
+
+/* Ensure Notification is Top Layer */
+#notification-container {
+    position: fixed;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10001 !important;
+    /* Above Everything */
+    width: 90%;
+    max-width: 400px;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* --- TABLET STATS LAYOUT REORDER --- */
+@media (max-width: 1024px) {
+    .stats-grid-layout {
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+    /* Graphics FIRST */
+    .stats-col-right {
+        order: 1 !important;
+        width: 100% !important;
+        margin-bottom: 30px;
+    }
+
+    /* Match Log SECOND (Bottom) */
+    .stats-col-left {
+        order: 2 !important;
+        width: 100% !important;
+    }
+}
+
+/* --- TABLET ACTION BUTTONS FIX --- */
+@media (max-width: 1024px) {
+    .action-buttons {
+        display: grid !important;
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 8px !important;
+    }
+}
+/* --- ENHANCED PRINT MODES (Appended) --- */
+@media print {
+    /* MODE: PRINT MAP (Hřiště + Časová osa + Kolečka) */
+    body.printing-map .stats-col-right,
+    body.printing-map .action-logs,
+    body.printing-map #match-stats-table,
+    body.printing-map .data-table,
+    body.printing-map canvas /* Hide charts if any */ {
+        display: none !important;
+    }
+
+    body.printing-map .stats-col-left {
+        width: 100% !important;
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+    }
+
+    /* Fix Court Size & Color */
+    body.printing-map .court-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        transform: none !important; /* Remove shrinking */
+        margin: 0 !important;
+        background-color: #2151A8 !important; /* Force Blue */
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        /* Ensure aspect ratio handles full width */
+        height: auto !important; 
+    }
+
+    /* MODE: PRINT LOG (Zápis pouze) */
+    body.printing-log .court-container,
+    body.printing-log .timeline-wrapper,
+    body.printing-log .stats-selectors-grid,
+    body.printing-log .stats-col-left {
+        display: none !important;
+    }
+
+    body.printing-log .stats-col-right {
+        display: block !important;
+        width: 100% !important;
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+    }
+
+    body.printing-log .action-logs {
+        display: block !important;
+        overflow: visible !important;
+        height: auto !important;
+        max-height: none !important;
+    }
+    
+    body.printing-log .log-item {
+        border-bottom: 1px solid #ddd !important;
+        color: black !important;
+    }
+}
