@@ -1163,7 +1163,7 @@
             const googleSelect = document.querySelector('.goog-te-combo');
             if (googleSelect) {
                 googleSelect.value = lang;
-                googleSelect.dispatchEvent(new Event('change'));
+                googleSelect.dispatchEvent(new Event('change', { bubbles: true, cancelable: true }));
             } else {
                 // Pojistka, pokud se Google modul ještě nenačetl
                 setTimeout(() => triggerGoogleTranslate(lang), 500);
